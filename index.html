@@ -2341,7 +2341,7 @@
     return helpHtml(tabTitle)
       + `<div class="card search-card"><div class="search-grid"><div class="sitem"><label>月份</label><input class="input" type="month" id="settle-month" style="width:160px;"></div><div class="sitem"><label>供应商名称</label><input class="input" placeholder="请输入" id="settle-name"></div></div>`
       + `<div class="search-btns"><button class="btn btn-primary" onclick="renderSettle()">查 询</button><button class="btn" onclick="resetSettleQuery()">重 置</button></div></div>`
-      + `<div class="card mt12"><div class="table-wrap"><table style="min-width:3200px;"><thead><tr>${SETTLE_HEADERS.map(h => `<th>${h}</th>`).join("")}</tr></thead><tbody id="settleTbody"></tbody></table></div>`
+      + `<div class="card mt12"><div class="table-wrap"><table style="min-width:3200px;"><thead><tr>${SETTLE_HEADERS.map((h, i) => `<th${i >= 2 ? ' style="text-align:right; padding-right:14px;"' : ''}>${h}</th>`).join("")}</tr></thead><tbody id="settleTbody"></tbody></table></div>`
       + `<div class="pager">共 <span id="settleTotal">0</span> 条</div></div>`;
   }
   function renderSettle() {
@@ -2351,7 +2351,7 @@
     const kw = nEl ? nEl.value.trim() : "";
     const list = settleRows.filter(r => (!m || r.month === m) && (!kw || r.name.includes(kw)));
     document.querySelectorAll("tbody#settleTbody").forEach(tb => {
-      tb.innerHTML = list.length ? list.map(r => `<tr>${SETTLE_KEYS.map(k => `<td${k === "month" || k === "name" ? "" : ' style="text-align:right;"'}>${settleNumTxt(r[k])}</td>`).join("")}</tr>`).join("") : '<tr><td colspan="23" class="empty">暂无数据</td></tr>';
+      tb.innerHTML = list.length ? list.map(r => `<tr>${SETTLE_KEYS.map(k => `<td${k === "month" || k === "name" ? "" : ' style="text-align:right; padding-right:14px;"'}>${settleNumTxt(r[k])}</td>`).join("")}</tr>`).join("") : '<tr><td colspan="23" class="empty">暂无数据</td></tr>';
     });
     document.querySelectorAll("#settleTotal").forEach(el => el.textContent = list.length);
   }
