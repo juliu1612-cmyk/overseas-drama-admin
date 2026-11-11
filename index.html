@@ -507,7 +507,7 @@
       </div>
       <div class="help-pop">
         <div class="help-title">供应商管理 / 供应商管理 · 功能交互逻辑</div>
-        <ul><li>搜索：按供应商名称输入筛选。</li><li>新建 / 编辑弹窗：版权方名称（必填）；分成设置按收入阶段设置分成比例——点「+ 添加收入阶段」添加多行，每行选择收入阶段（上新期 / 增长期 / 成熟期 / 长尾期）+ 分成比例%（0~100），同一收入阶段不可重复，保存时校验。</li><li>列表：ID / 供应商名称 / 分成设置（各收入阶段及比例，多个用「 、 」分隔）/ 创建日期 / 操作（编辑、删除）。</li><li>删除有「是否删除该供应商」二次确认。</li></ul>
+        <ul><li>搜索：按供应商名称输入筛选。</li><li>新建 / 编辑弹窗：版权方名称（必填）；分成设置按收入范围设置分成比例——点「+ 添加收入范围」添加多行，每行填写收入范围（美元，同一收入范围不可重复）+ 分成比例%（0~100），保存时校验。</li><li>列表：ID / 供应商名称 / 分成设置（各收入范围及比例，多个用「 、 」分隔）/ 创建日期 / 操作（编辑、删除）。</li><li>删除有「是否删除该供应商」二次确认。</li></ul>
         <div class="help-note">鼠标移出即可关闭</div>
       </div>
     </div><div class="card search-card"><div class="search-grid"><div class="sitem"><label>供应商名称</label><input class="input" placeholder="请输入" id="sup-name"></div></div><div class="search-btns"><button class="btn btn-primary" onclick="toast('查询完成')">查 询</button><button class="btn" onclick="resetSupQuery()">重 置</button></div></div><div class="card mt12"><div class="table-toolbar"><button class="btn btn-primary" onclick="openSupDialog('add')">新 建</button></div><div class="table-wrap"><table style="min-width:1000px;"><thead><tr><th style="width:70px;">ID</th><th>供应商名称</th><th style="width:320px;">分成设置</th><th style="width:180px;">创建日期</th><th class="col-ops" style="width:110px;">操作</th></tr></thead><tbody id="supTbody"><tr>
@@ -860,7 +860,7 @@
       <div class="form-item" data-page-node-id="1nhaOfV3FiLgkTXw73Mxdh"><label class="form-label" data-page-node-id="afqNb8w2W8KEetAGozYKsy"><span class="req" data-page-node-id="DrUc9nH7umFwTfvPMPAFBM">*</span>版权方名称</label><div class="form-content" data-page-node-id="IYBqOzRcAHz3q4JOBTYkvS"><input class="input" id="f-sup-name" placeholder="请输入" data-page-node-id="1PcAPPzuMlCNn5yPK7lg5C"></div></div>
       <div class="form-item"><label class="form-label"><span class="req">*</span>分成设置</label><div class="form-content">
         <div id="supShareRows"></div>
-        <div style="padding:2px 0 8px;"><button class="btn btn-sm" onclick="addSupShareRow()">+ 添加收入阶段</button><span class="hint" style="margin-left:8px;">按收入阶段设置分成比例，同一收入阶段不可重复</span></div>
+        <div style="padding:2px 0 8px;"><button class="btn btn-sm" onclick="addSupShareRow()">+ 添加收入范围</button><span class="hint" style="margin-left:8px;">按收入范围（美元）设置分成比例，同一收入范围不可重复</span></div>
       </div></div>
     </div>
     <div class="dialog-footer" data-page-node-id="4BGVBVJHEQTErLEyOK0r2G">
@@ -1709,8 +1709,8 @@
     ],
     [SUP_TAB]: [
       '搜索：按供应商名称输入筛选。',
-      '新建 / 编辑弹窗：版权方名称（必填）；分成设置按收入阶段设置分成比例——点「+ 添加收入阶段」添加多行，每行选择收入阶段（上新期 / 增长期 / 成熟期 / 长尾期）+ 分成比例%（0~100），同一收入阶段不可重复，保存时校验。',
-      '列表：ID / 供应商名称 / 分成设置（各收入阶段及比例，多个用「 、 」分隔）/ 创建日期 / 操作（编辑、删除）。',
+      '新建 / 编辑弹窗：版权方名称（必填）；分成设置按收入范围设置分成比例——点「+ 添加收入范围」添加多行，每行填写收入范围（美元，同一收入范围不可重复）+ 分成比例%（0~100），保存时校验。',
+      '列表：ID / 供应商名称 / 分成设置（各收入范围及比例，多个用「 、 」分隔）/ 创建日期 / 操作（编辑、删除）。',
       '删除有「是否删除该供应商」二次确认。'
     ],
     [SUPS_TAB]: [
@@ -2241,18 +2241,17 @@
   }
 
   /* ========== 供应商管理（复刻自测试环境后台） ========== */
-  const SUP_STAGES = ["上新期", "增长期", "成熟期", "长尾期"];
   const SUP_SEARCH = [
     [ { label: "供应商名称", type: "input", id: "sup-name" } ]
   ];
   let supRows = [
-    { id: 1, name: "容量互娱", share: [{ stage: "上新期", ratio: "30" }, { stage: "成熟期", ratio: "15" }], time: "2025-07-08 16:52:58" },
+    { id: 1, name: "容量互娱", share: [{ range: "10000", ratio: "30" }, { range: "50000", ratio: "15" }], time: "2025-07-08 16:52:58" },
     { id: 3, name: "红果短剧", share: [], time: "2025-11-12 11:21:55" },
     { id: 4, name: "测试滴答滴", share: [], time: "2025-11-13 15:41:38" },
     { id: 5, name: "吾里", share: [], time: "2025-11-13 15:43:25" },
     { id: 6, name: "西瓜", share: [], time: "2025-11-13 15:43:34" },
     { id: 7, name: "测试", share: [], time: "2025-12-25 11:52:40" },
-    { id: 11, name: "测试1", share: [{ stage: "上新期", ratio: "25" }], time: "2026-03-23 15:04:43" },
+    { id: 11, name: "测试1", share: [{ range: "20000", ratio: "25" }], time: "2026-03-23 15:04:43" },
     { id: 12, name: "测试111", share: [], time: "2026-03-23 15:43:20" },
     { id: 15, name: "测试222", share: [], time: "2026-03-23 16:36:03" },
     { id: 16, name: "测试333", share: [], time: "2026-03-23 16:48:36" },
@@ -2300,7 +2299,7 @@
   }
   function resetSettleQuery() { ["settle-month","settle-name"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; }); renderSettle(); }
   function supShareTxt(r) {
-    return (r.share || []).length ? r.share.map(x => `${x.stage} ${x.ratio}%`).join(" 、 ") : '<span class="dash">-</span>';
+    return (r.share || []).length ? r.share.map(x => `${x.range}美元 ${x.ratio}%`).join(" 、 ") : '<span class="dash">-</span>';
   }
   function renderSupTable() {
     const nameEl = document.getElementById("sup-name");
@@ -2316,7 +2315,7 @@
   }
   function resetSupQuery() { ["sup-name"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; }); renderSupTable(); }
 
-  /* 供应商：分成设置（按收入阶段设置分成比例） */
+  /* 供应商：分成设置（按收入范围设置分成比例） */
   function addSupShareRow(pref) {
     const j = ++supShareSeq;
     const row = document.createElement("div");
@@ -2324,12 +2323,12 @@
     row.dataset.i = j;
     row.style.cssText = "display:flex;align-items:center;gap:8px;margin-bottom:8px;";
     row.innerHTML = `
-      <select class="input" id="sup-stage-${j}" style="width:150px;"><option value="">请选择收入阶段</option>${SUP_STAGES.map(v => `<option value="${v}">${v}</option>`).join("")}</select>
+      <span class="unit-wrap" style="width:170px;"><input class="input" id="sup-range-${j}" placeholder="收入范围"><span class="unit">美元</span></span>
       <span class="unit-wrap" style="width:130px;"><input class="input" id="sup-ratio-${j}" placeholder="分成比例"><span class="unit">%</span></span>
       <span class="link danger" style="font-size:12px;" onclick="removeSupShareRow(this)">删除</span>`;
     document.getElementById("supShareRows").appendChild(row);
     if (pref) {
-      document.getElementById("sup-stage-" + j).value = pref.stage || "";
+      document.getElementById("sup-range-" + j).value = pref.range || "";
       document.getElementById("sup-ratio-" + j).value = pref.ratio || "";
     }
     syncSelects();
@@ -2338,18 +2337,19 @@
   function resetSupShareRows() { document.getElementById("supShareRows").innerHTML = ""; }
   function collectSupShare() {
     const rows = [...document.querySelectorAll("#supShareRows .sup-share-row")];
-    if (!rows.length) { toast("请至少添加一个收入阶段的分成比例"); return false; }
+    if (!rows.length) { toast("请至少添加一个收入范围的分成比例"); return false; }
     const seen = {};
     const out = [];
     for (let k = 0; k < rows.length; k++) {
       const j = rows[k].dataset.i;
-      const stage = document.getElementById("sup-stage-" + j).value;
+      const range = document.getElementById("sup-range-" + j).value.trim();
       const ratio = document.getElementById("sup-ratio-" + j).value.trim();
-      if (!stage) { toast(`第 ${k + 1} 行：请选择收入阶段`); return false; }
-      if (seen[stage] !== undefined) { toast(`收入阶段「${stage}」已设置，不可重复`); return false; }
-      seen[stage] = k;
-      if (!ratio || isNaN(+ratio) || +ratio <= 0 || +ratio > 100) { toast(`「${stage}」：分成比例需为 0~100 的数字`); return false; }
-      out.push({ stage, ratio });
+      if (!range) { toast(`第 ${k + 1} 行：请填写收入范围`); return false; }
+      if (isNaN(+range) || +range <= 0) { toast(`第 ${k + 1} 行：收入范围需为大于 0 的数字`); return false; }
+      if (seen[range] !== undefined) { toast(`收入范围「${range}美元」已设置，不可重复`); return false; }
+      seen[range] = k;
+      if (!ratio || isNaN(+ratio) || +ratio <= 0 || +ratio > 100) { toast(`收入范围「${range}美元」：分成比例需为 0~100 的数字`); return false; }
+      out.push({ range, ratio });
     }
     return out;
   }
