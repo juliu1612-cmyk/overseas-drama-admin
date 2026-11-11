@@ -182,6 +182,21 @@
   .help-pop li { font-size: 12.5px; color: #606266; line-height: 1.85; margin-bottom: 4px; }
   .help-pop li::marker { color: #1677ff; }
   .help-pop .help-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ebeef5; font-size: 12px; color: #909399; }
+  /* 交互说明：本机编辑态（口令解锁后可用） */
+  .help-pop .help-editbar { display: none; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ebeef5; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .panel-help.editing .help-pop { display: block !important; width: 470px; }
+  .panel-help.editing .help-pop .help-note { display: none; }
+  .panel-help.editing .help-pop .help-editbar { display: flex; }
+  .panel-help.editing .help-pop ul { max-height: 46vh; overflow: auto; padding: 8px 10px 8px 24px; background: #fbfdff; outline: 1px dashed #c6e2ff; outline-offset: 3px; border-radius: 4px; }
+  .panel-help.editing .help-pop ul:focus { outline: 1px solid #1677ff; }
+  .panel-help.editing .help-pop li:focus { background: #fff7e6; outline: none; border-radius: 3px; }
+  .panel-help.editing .help-pop .help-title::after { content: '编辑中'; margin-left: auto; font-size: 11px; font-weight: 400; color: #e6a23c; background: #fdf6ec; border: 1px solid #faecd8; border-radius: 10px; padding: 0 6px; line-height: 16px; }
+  .help-editbar .btn { height: 24px; padding: 0 8px; font-size: 12px; line-height: 22px; }
+  .help-editbar .hint { font-size: 11px; color: #909399; flex: 1 1 100%; }
+  body.help-owner .help-pop .help-note::after { content: ' · 双击可编辑'; color: #1677ff; }
+  #helpExportText { width: 100%; height: 330px; margin-top: 8px; padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-family: Menlo, Consolas, monospace; font-size: 12px; line-height: 1.65; color: #303133; background: #fafafa; resize: vertical; box-sizing: border-box; }
+  .help-ro-badge { display: none; }
+  body.help-owner .help-ro-badge { display: inline-block; }
   /* 内容列表 / 短剧管理页面 */
   .search-card { padding: 18px 20px 14px; }
   .search-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 28px; }
@@ -866,6 +881,38 @@
     <div class="dialog-footer" data-page-node-id="4BGVBVJHEQTErLEyOK0r2G">
       <button class="btn" onclick="closeSup()" data-page-node-id="Wsgw8WgcqIbaZPmcY1E9dg">取 消</button>
       <button class="btn btn-primary" onclick="saveSup()" data-page-node-id="G5kBTuliKvx8ytpDzQG5kM">确 定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 交互说明：编辑口令解锁 -->
+<div class="mask hidden" id="helpAuthMask">
+  <div class="dialog" style="width:400px;">
+    <div class="dialog-header"><span>开启交互说明编辑</span><span class="x" onclick="closeHelpAuth()">×</span></div>
+    <div class="dialog-body">
+      <div class="form-item"><label class="form-label">编辑口令</label>
+        <div class="form-content"><input class="input" id="helpAuthPwd" type="password" placeholder="请输入编辑口令" autocomplete="off"></div>
+      </div>
+      <div class="hint" id="helpAuthHint">校验通过后，仅在此设备（本机浏览器）开启编辑入口，其他设备只能查看。</div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn" onclick="closeHelpAuth()">取 消</button>
+      <button class="btn btn-primary" onclick="confirmHelpAuth()">确 定</button>
+    </div>
+  </div>
+</div>
+
+<!-- 交互说明：导出当前文案 -->
+<div class="mask hidden" id="helpExportMask">
+  <div class="dialog" style="width:680px;">
+    <div class="dialog-header"><span>复制交互说明文案</span><span class="x" onclick="closeHelpExport()">×</span></div>
+    <div class="dialog-body">
+      <div class="hint">以下是全部页面当前的说明文案（含你在本机的修改）。复制后交给开发者更新线上文件，其他人打开就能看到新文案。</div>
+      <textarea id="helpExportText" readonly spellcheck="false"></textarea>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn" onclick="closeHelpExport()">关 闭</button>
+      <button class="btn btn-primary" onclick="copyHelpExport()">复 制</button>
     </div>
   </div>
 </div>
@@ -1800,7 +1847,7 @@
   };
   function helpHtml(tab) {
     const items = PAGE_HELP[tab] || ['该页面暂未配置交互说明。'];
-    return `<div class="panel-help">
+    return `<div class="panel-help" data-help-key="${tab}">
       <div class="help-trigger">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.4"/><path d="M6.3 6.1a1.8 1.8 0 013.4.7c0 1.2-1.7 1.4-1.7 2.6" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".6" fill="currentColor" stroke="none"/></svg>
         交互说明
@@ -2545,10 +2592,11 @@
       el.id = id; el.className = "tab-panel hidden"; el.innerHTML = html;
       document.getElementById("content").appendChild(el);
     }
+    if (typeof applyHelpOverrides === 'function') applyHelpOverrides();
     return el;
   }
 
-  /* 说明按钮：可拖动 + 位置记忆（双击复位到右上角） */
+  /* 说明按钮：可拖动 + 位置记忆（双击进入编辑，见文末「交互说明编辑」） */
   let helpPos = null;
   try { helpPos = JSON.parse(localStorage.getItem('helpBtnPos') || 'null'); } catch (e) { helpPos = null; }
 
@@ -2572,6 +2620,7 @@
     const t = e.target.closest('.help-trigger');
     if (!t) return;
     const h = t.closest('.panel-help');
+    if (h.classList.contains('editing')) return;
     const r = h.getBoundingClientRect();
     drag = { h, panel: h.closest('.tab-panel'), offX: e.clientX - r.left, offY: e.clientY - r.top, sx: e.clientX, sy: e.clientY, moved: false };
     h.classList.add('dragging');
@@ -2608,13 +2657,13 @@
     }
     drag = null;
   });
-  // 双击复位
+  // 双击「交互说明」进入编辑（仅本机已解锁的设备；未解锁则弹口令框）
   document.addEventListener('dblclick', e => {
-    if (!e.target.closest('.help-trigger')) return;
-    helpPos = null;
-    try { localStorage.removeItem('helpBtnPos'); } catch (e) {}
-    applyHelpPos();
-    toast('说明按钮已恢复默认位置');
+    const h = e.target.closest('.panel-help');
+    if (!h) return;
+    if (h.classList.contains('editing')) return;
+    if (!helpOwner) { openHelpAuth(); return; }
+    enterHelpEdit(h);
   });
 
   function renderMenu() {
@@ -2726,6 +2775,259 @@
   if (formHelp) formHelp.style.top = '56px'; /* 默认下移，避开「返回列表」按钮 */
   applyHelpPos();
   window.addEventListener('resize', applyHelpPos);
+
+  /* ==========================================================
+     交互说明：本机编辑（口令解锁，仅本机浏览器可编辑）
+     - 未解锁：双击无编辑入口，只能看（会提示输口令）
+     - 解锁后：双击「交互说明」→ 内容可增删改 → 「完成」保存
+     - 修改保存在本机浏览器；「复制全部」可导出文案给开发者更新线上
+     ========================================================== */
+  const HELP_EDIT_PASS = 'drama2026';   /* ← 编辑口令（想换口令改这里） */
+  const HELP_OWNER_KEY = 'dramaHelpOwner_v1';
+  const HELP_DATA_KEY = 'dramaHelpData_v1';
+  const HELP_DEFAULTS = {};             /* 各页面原始文案，用于「恢复默认」 */
+
+  function helpFingerprint() {
+    const s = [navigator.userAgent, navigator.platform || '', navigator.language || '',
+      screen.width + 'x' + screen.height, new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency || 0].join('|');
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+    return h.toString(36);
+  }
+
+  var helpOwner = (function () {
+    try { return localStorage.getItem(HELP_OWNER_KEY) === helpFingerprint(); } catch (e) { return false; }
+  })();
+
+  var helpOverrides = (function () {
+    try { return JSON.parse(localStorage.getItem(HELP_DATA_KEY) || '{}') || {}; } catch (e) { return {}; }
+  })();
+
+  let helpEditing = null;
+
+  function helpEscape(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function helpKeyOf(h) {
+    if (h.dataset.helpKey) return h.dataset.helpKey;
+    const panel = h.closest('.tab-panel');
+    let key = '';
+    if (panel && panel.id === 'panel-list') key = LIST_TAB;
+    else if (panel && panel.id.indexOf('panel-') === 0) {
+      try { key = decodeURIComponent(panel.id.slice(6)); } catch (e) { key = ''; }
+    }
+    if (!key) key = '__help_' + Array.prototype.indexOf.call(document.querySelectorAll('.panel-help'), h);
+    h.dataset.helpKey = key;
+    return key;
+  }
+
+  function helpItemsOf(h) {
+    return [...h.querySelectorAll('.help-pop > ul > li')].map(li => li.textContent.trim()).filter(Boolean);
+  }
+
+  function fillHelpUl(h, items) {
+    const ul = h.querySelector('.help-pop > ul');
+    if (!ul) return;
+    ul.innerHTML = items.map(t => '<li>' + helpEscape(t) + '</li>').join('');
+  }
+
+  function applyHelpOverrides() {
+    if (!helpOverrides) return;
+    document.querySelectorAll('.tab-panel .panel-help').forEach(h => {
+      const key = helpKeyOf(h);
+      if (!HELP_DEFAULTS[key]) HELP_DEFAULTS[key] = helpItemsOf(h);
+      const arr = helpOverrides[key];
+      if (Array.isArray(arr) && arr.length) fillHelpUl(h, arr);
+    });
+  }
+
+  const HELP_EDITBAR = '<div class="help-editbar">'
+    + '<span class="hint">直接改文字，回车新增一条，选中文字按退格可删除</span>'
+    + '<button class="btn btn-sm" onclick="addHelpLine()">+ 条目</button>'
+    + '<button class="btn btn-sm" onclick="restoreHelpDefault()">恢复默认</button>'
+    + '<button class="btn btn-sm" onclick="openHelpExport()">复制全部</button>'
+    + '<button class="btn btn-sm" onclick="exitHelpOwner()">退出编辑权</button>'
+    + '<button class="btn btn-sm" onclick="cancelHelpEdit()">取 消</button>'
+    + '<button class="btn btn-primary btn-sm" onclick="finishHelpEdit()">完 成</button>'
+    + '</div>';
+
+  function enterHelpEdit(h) {
+    if (helpEditing === h) return;
+    if (helpEditing) finishHelpEdit();
+    const pop = h.querySelector('.help-pop');
+    const ul = pop && pop.querySelector('ul');
+    if (!ul) return;
+    if (!pop.querySelector('.help-editbar')) pop.insertAdjacentHTML('beforeend', HELP_EDITBAR);
+    helpEditing = h;
+    h.classList.add('editing');
+    ul.setAttribute('contenteditable', 'true');
+    ul.setAttribute('spellcheck', 'false');
+    ul.focus();
+    const r = document.createRange();
+    r.selectNodeContents(ul); r.collapse(false);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+
+  function exitHelpEditUI(h) {
+    if (!h) return;
+    h.classList.remove('editing');
+    const ul = h.querySelector('.help-pop ul');
+    if (ul) ul.removeAttribute('contenteditable');
+    helpEditing = null;
+  }
+
+  function finishHelpEdit() {
+    if (!helpEditing) return;
+    const h = helpEditing;
+    const ul = h.querySelector('.help-pop > ul');
+    const lines = (ul.innerText || '').split('\n')
+      .map(s => s.replace(/\u00a0/g, ' ').replace(/\s+$/, '').trim())
+      .filter(Boolean);
+    if (!lines.length) { toast('至少保留一条说明内容'); return; }
+    const key = helpKeyOf(h);
+    helpOverrides[key] = lines;
+    try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
+    exitHelpEditUI(h);
+    fillHelpUl(h, lines);
+    toast('交互说明已保存（本机生效，可「复制全部」同步线上）');
+  }
+
+  function cancelHelpEdit() {
+    if (!helpEditing) return;
+    const h = helpEditing;
+    const key = helpKeyOf(h);
+    const back = (helpOverrides[key] && helpOverrides[key].length) ? helpOverrides[key] : (HELP_DEFAULTS[key] || []);
+    exitHelpEditUI(h);
+    fillHelpUl(h, back);
+  }
+
+  function addHelpLine() {
+    if (!helpEditing) return;
+    const ul = helpEditing.querySelector('.help-pop > ul');
+    const li = document.createElement('li');
+    li.textContent = '新增说明…';
+    ul.appendChild(li);
+    ul.focus();
+    const r = document.createRange();
+    r.selectNodeContents(li);
+    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+
+  function restoreHelpDefault() {
+    if (!helpEditing) return;
+    const h = helpEditing, key = helpKeyOf(h);
+    const dft = HELP_DEFAULTS[key] || (PAGE_HELP[key] ? PAGE_HELP[key].slice() : []);
+    if (!dft.length) return;
+    fillHelpUl(h, dft);
+    toast('已恢复默认文案，点「完成」保存');
+  }
+
+  function helpExportJson() {
+    const all = {};
+    Object.keys(HELP_DEFAULTS).forEach(k => {
+      all[k] = (helpOverrides[k] && helpOverrides[k].length) ? helpOverrides[k] : HELP_DEFAULTS[k];
+    });
+    return JSON.stringify(all, null, 2);
+  }
+
+  function openHelpExport() {
+    if (helpEditing) finishHelpEdit();
+    document.getElementById('helpExportText').value = helpExportJson();
+    document.getElementById('helpExportMask').classList.remove('hidden');
+  }
+
+  function closeHelpExport() {
+    document.getElementById('helpExportMask').classList.add('hidden');
+  }
+
+  function copyHelpExport() {
+    const ta = document.getElementById('helpExportText');
+    ta.removeAttribute('readonly');
+    ta.select();
+    ta.setSelectionRange(0, ta.value.length);
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.setAttribute('readonly', 'readonly');
+    if (!ok && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value)
+        .then(() => toast('已复制，可粘贴给开发者更新线上'))
+        .catch(() => toast('复制失败，请手动全选复制'));
+      return;
+    }
+    toast(ok ? '已复制，可粘贴给开发者更新线上' : '复制失败，请手动全选复制');
+  }
+
+  function markHelpOwnerUI() {
+    document.body.classList.toggle('help-owner', !!helpOwner);
+  }
+
+  function openHelpAuth() {
+    if (helpOwner) { toast('本机已开启编辑，双击说明即可修改'); return; }
+    const m = document.getElementById('helpAuthMask');
+    m.classList.remove('hidden');
+    document.getElementById('helpAuthPwd').value = '';
+    const hint = document.getElementById('helpAuthHint');
+    hint.textContent = '校验通过后，仅在此设备（本机浏览器）开启编辑入口，其他设备只能查看。';
+    hint.style.color = '#909399';
+    setTimeout(() => document.getElementById('helpAuthPwd').focus(), 50);
+  }
+
+  function closeHelpAuth() {
+    document.getElementById('helpAuthMask').classList.add('hidden');
+  }
+
+  function confirmHelpAuth() {
+    const v = document.getElementById('helpAuthPwd').value.trim();
+    if (v !== HELP_EDIT_PASS) {
+      const hint = document.getElementById('helpAuthHint');
+      hint.textContent = '口令不正确，请重试。';
+      hint.style.color = '#f56c6c';
+      return;
+    }
+    helpOwner = true;
+    try { localStorage.setItem(HELP_OWNER_KEY, helpFingerprint()); } catch (e) {}
+    closeHelpAuth();
+    markHelpOwnerUI();
+    toast('已开启编辑：双击任意「交互说明」即可修改');
+  }
+
+  function exitHelpOwner() {
+    if (helpEditing) exitHelpEditUI(helpEditing);
+    try { localStorage.removeItem(HELP_OWNER_KEY); } catch (e) {}
+    helpOwner = false;
+    markHelpOwnerUI();
+    toast('已退出编辑身份，本机恢复只读');
+    setTimeout(() => location.reload(), 900);
+  }
+
+  /* 点击编辑区外自动保存退出 */
+  document.addEventListener('mousedown', e => {
+    if (!helpEditing) return;
+    if (e.target.closest('.panel-help') === helpEditing) return;
+    if (e.target.closest('#helpExportMask') || e.target.closest('#helpAuthMask')) return;
+    finishHelpEdit();
+  });
+
+  /* Esc = 保存退出（避免误丢改动） */
+  document.addEventListener('keydown', e => {
+    if (!helpEditing) return;
+    if (e.key === 'Escape') { e.preventDefault(); finishHelpEdit(); }
+  });
+
+  function initHelpEditing() {
+    /* 先记录所有页面原始文案，再应用本机修改 */
+    document.querySelectorAll('.tab-panel .panel-help').forEach(h => {
+      const key = helpKeyOf(h);
+      if (!HELP_DEFAULTS[key]) HELP_DEFAULTS[key] = helpItemsOf(h);
+    });
+    applyHelpOverrides();
+    markHelpOwnerUI();
+    const pwd = document.getElementById('helpAuthPwd');
+    if (pwd) pwd.addEventListener('keydown', e => { if (e.key === 'Enter') confirmHelpAuth(); });
+  }
+  initHelpEditing();
 </script>
 
 
