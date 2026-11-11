@@ -178,9 +178,12 @@
   .panel-help:hover .help-pop { display: block; }
   .help-pop .help-title { font-size: 13px; font-weight: 600; color: #303133; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
   .help-pop .help-title::before { content: ''; width: 3px; height: 13px; background: #1677ff; border-radius: 2px; }
-  .help-pop ul { padding-left: 16px; }
+  .help-pop ul { padding-left: 4px; list-style: none; }
   .help-pop li { font-size: 12.5px; color: #606266; line-height: 1.85; margin-bottom: 4px; }
-  .help-pop li::marker { color: #1677ff; }
+  .help-pop li::before { content: attr(data-num) '\00a0'; color: #1677ff; font-weight: 600; font-size: 12px; }
+  .help-pop li[data-lv="1"] { margin-left: 24px; }
+  .help-pop li[data-lv="2"] { margin-left: 48px; }
+  .help-pop li[data-lv="3"] { margin-left: 72px; }
   .help-pop .help-note { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ebeef5; font-size: 12px; color: #909399; }
   /* 交互说明：本机编辑态（口令解锁后可用） */
   .help-pop .help-editbar { display: none; margin-top: 10px; padding-top: 8px; border-top: 1px dashed #ebeef5; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -193,10 +196,7 @@
   .panel-help.editing .help-pop .help-title::after { content: '编辑中'; margin-left: auto; font-size: 11px; font-weight: 400; color: #e6a23c; background: #fdf6ec; border: 1px solid #faecd8; border-radius: 10px; padding: 0 6px; line-height: 16px; }
   .help-editbar .btn { height: 24px; padding: 0 8px; font-size: 12px; line-height: 22px; }
   .help-editbar .hint { font-size: 11px; color: #909399; flex: 1 1 100%; }
-  body.help-owner .help-pop .help-note::after { content: ' · 双击可编辑'; color: #1677ff; }
   #helpExportText { width: 100%; height: 330px; margin-top: 8px; padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-family: Menlo, Consolas, monospace; font-size: 12px; line-height: 1.65; color: #303133; background: #fafafa; resize: vertical; box-sizing: border-box; }
-  .help-ro-badge { display: none; }
-  body.help-owner .help-ro-badge { display: inline-block; }
   /* 内容列表 / 短剧管理页面 */
   .search-card { padding: 18px 20px 14px; }
   .search-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 28px; }
@@ -2823,14 +2823,43 @@
     return key;
   }
 
+  /* 条目：{ t: 文本, lv: 层级 0~3 }；旧格式（纯字符串）= 顶层 */
+  function normalizeHelpItems(items) {
+    return (items || []).map(it => {
+      if (typeof it === 'string') return { t: it.trim(), lv: 0 };
+      return { t: String(it.t || '').trim(), lv: Math.max(0, Math.min(3, +it.lv || 0)) };
+    }).filter(x => x.t);
+  }
+
+  /* 飞书式编号：顶层 1. 2. 3.；子级 1.1 / 1.1.1；换层时深层计数重置 */
+  function renumberUl(ul) {
+    const c = [];
+    [...ul.children].forEach(li => {
+      if (li.tagName !== 'LI') return;
+      const lv = Math.max(0, Math.min(3, +(li.dataset.lv || 0)));
+      c.length = lv + 1;
+      for (let i = 0; i < lv; i++) if (!c[i]) c[i] = 1;   /* 层级断裂时缺层补 1（同飞书） */
+      c[lv] = (c[lv] || 0) + 1;
+      li.dataset.lv = lv;
+      li.dataset.num = c.slice(0, lv + 1).join('.') + (lv === 0 ? '.' : '');
+    });
+  }
+
   function helpItemsOf(h) {
-    return [...h.querySelectorAll('.help-pop > ul > li')].map(li => li.textContent.trim()).filter(Boolean);
+    const ul = h.querySelector('.help-pop > ul');
+    if (!ul) return [];
+    return [...ul.children]
+      .filter(li => li.tagName === 'LI')
+      .map(li => ({ t: li.textContent.trim(), lv: Math.min(3, +(li.dataset.lv || 0)) }))
+      .filter(x => x.t);
   }
 
   function fillHelpUl(h, items) {
     const ul = h.querySelector('.help-pop > ul');
     if (!ul) return;
-    ul.innerHTML = items.map(t => '<li>' + helpEscape(t) + '</li>').join('');
+    ul.innerHTML = normalizeHelpItems(items).map(it =>
+      '<li data-lv="' + it.lv + '">' + helpEscape(it.t) + '</li>').join('');
+    renumberUl(ul);
   }
 
   function applyHelpOverrides() {
@@ -2839,12 +2868,12 @@
       const key = helpKeyOf(h);
       if (!HELP_DEFAULTS[key]) HELP_DEFAULTS[key] = helpItemsOf(h);
       const arr = helpOverrides[key];
-      if (Array.isArray(arr) && arr.length) fillHelpUl(h, arr);
+      fillHelpUl(h, (Array.isArray(arr) && arr.length) ? arr : HELP_DEFAULTS[key]);
     });
   }
 
   const HELP_EDITBAR = '<div class="help-editbar">'
-    + '<span class="hint">直接改文字，回车新增一条，选中文字按退格可删除</span>'
+    + '<span class="hint">直接改文字；回车新增一条，Tab 加层级、Shift+Tab 减层级（多级编号：1. / 1.1 / 1.1.1）</span>'
     + '<button class="btn btn-sm" onclick="addHelpLine()">+ 条目</button>'
     + '<button class="btn btn-sm" onclick="restoreHelpDefault()">恢复默认</button>'
     + '<button class="btn btn-sm" onclick="openHelpExport()">复制全部</button>'
@@ -2881,16 +2910,13 @@
   function finishHelpEdit() {
     if (!helpEditing) return;
     const h = helpEditing;
-    const ul = h.querySelector('.help-pop > ul');
-    const lines = (ul.innerText || '').split('\n')
-      .map(s => s.replace(/\u00a0/g, ' ').replace(/\s+$/, '').trim())
-      .filter(Boolean);
-    if (!lines.length) { toast('至少保留一条说明内容'); return; }
+    const items = normalizeHelpItems(helpItemsOf(h));
+    if (!items.length) { toast('至少保留一条说明内容'); return; }
     const key = helpKeyOf(h);
-    helpOverrides[key] = lines;
+    helpOverrides[key] = items.map(it => it.lv > 0 ? { t: it.t, lv: it.lv } : it.t);
     try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
     exitHelpEditUI(h);
-    fillHelpUl(h, lines);
+    fillHelpUl(h, items);
     toast('交互说明已保存（本机生效，可「复制全部」同步线上）');
   }
 
@@ -2906,13 +2932,16 @@
   function addHelpLine() {
     if (!helpEditing) return;
     const ul = helpEditing.querySelector('.help-pop > ul');
+    const info = helpCaretInfo(ul);
+    let ref = info ? info.li : ul.lastElementChild;
+    const lv = ref ? Math.min(3, +(ref.dataset.lv || 0)) : 0;
     const li = document.createElement('li');
+    li.dataset.lv = lv;
     li.textContent = '新增说明…';
-    ul.appendChild(li);
+    if (ref && ref.tagName === 'LI') ref.after(li); else ul.appendChild(li);
+    renumberUl(ul);
     ul.focus();
-    const r = document.createRange();
-    r.selectNodeContents(li);
-    const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    placeCaretEnd(li);
   }
 
   function restoreHelpDefault() {
@@ -2927,7 +2956,8 @@
   function helpExportJson() {
     const all = {};
     Object.keys(HELP_DEFAULTS).forEach(k => {
-      all[k] = (helpOverrides[k] && helpOverrides[k].length) ? helpOverrides[k] : HELP_DEFAULTS[k];
+      const arr = normalizeHelpItems((helpOverrides[k] && helpOverrides[k].length) ? helpOverrides[k] : HELP_DEFAULTS[k]);
+      all[k] = arr.map(it => it.lv > 0 ? { t: it.t, lv: it.lv } : it.t);
     });
     return JSON.stringify(all, null, 2);
   }
@@ -3010,10 +3040,109 @@
     finishHelpEdit();
   });
 
-  /* Esc = 保存退出（避免误丢改动） */
+  /* ===== 编辑态键盘行为（飞书式多级列表） ===== */
+  function helpCaretInfo(ul) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return null;
+    const r0 = sel.getRangeAt(0);
+    let n = r0.startContainer;
+    if (n.nodeType === 3) n = n.parentNode;
+    const li = n && n.closest ? n.closest('.help-pop > ul > li') : null;
+    if (!li || !ul.contains(li)) return null;
+    const r = r0.cloneRange();
+    r.selectNodeContents(li);
+    try { r.setEnd(r0.endContainer, r0.endOffset); } catch (e) {}
+    return { li, off: r.toString().length };
+  }
+
+  function placeCaretEnd(el) {
+    if (!el) return;
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    r.collapse(false);
+    const s = window.getSelection();
+    s.removeAllRanges();
+    s.addRange(r);
+  }
+
   document.addEventListener('keydown', e => {
     if (!helpEditing) return;
-    if (e.key === 'Escape') { e.preventDefault(); finishHelpEdit(); }
+    const ul = helpEditing.querySelector('.help-pop > ul');
+    if (!ul) return;
+    const inUl = e.target === ul || ul.contains(e.target);
+    if (e.key === 'Escape') { e.preventDefault(); finishHelpEdit(); return; }
+    if (!inUl) return;
+    const info = helpCaretInfo(ul);
+
+    if (e.key === 'Tab' && info) {
+      e.preventDefault();
+      const lv = Math.max(0, Math.min(3, (+info.li.dataset.lv || 0) + (e.shiftKey ? -1 : 1)));
+      info.li.dataset.lv = lv;
+      renumberUl(ul);
+      placeCaretEnd(info.li);
+      return;
+    }
+    if (e.key === 'Enter' && info) {
+      e.preventDefault();
+      const text = info.li.textContent;
+      const lv = +(info.li.dataset.lv || 0);
+      if (!text.trim()) {           /* 空条目回车 → 删除该条，光标回到上一条末尾 */
+        const prev = info.li.previousElementSibling;
+        info.li.remove();
+        renumberUl(ul);
+        placeCaretEnd(prev && prev.tagName === 'LI' ? prev : ul.lastElementChild);
+        return;
+      }
+      const before = text.slice(0, info.off), after = text.slice(info.off);
+      info.li.textContent = before;
+      const nl = document.createElement('li');
+      nl.dataset.lv = lv;
+      nl.textContent = after;
+      info.li.after(nl);
+      renumberUl(ul);
+      placeCaretEnd(nl);
+      return;
+    }
+    if (e.key === 'Backspace' && info && !info.li.textContent.trim()) {
+      e.preventDefault();           /* 空条目退格 → 删除该条 */
+      const prev = info.li.previousElementSibling;
+      info.li.remove();
+      renumberUl(ul);
+      placeCaretEnd(prev && prev.tagName === 'LI' ? prev : ul.lastElementChild);
+      return;
+    }
+  });
+
+  /* 编辑中 DOM 被浏览器改动（如回车合并）时，把结构规整回 li 列表 */
+  function normalizeHelpUl(ul) {
+    const hasBad = [...ul.children].some(ch => ch.tagName !== 'LI');
+    const nested = ul.querySelectorAll(':scope > li > ul, :scope > li > ol').length;
+    if (!hasBad && !nested) { renumberUl(ul); return; }
+    ul.querySelectorAll(':scope > li > ul, :scope > li > ol').forEach(sub => {
+      const p = sub.closest('li');
+      const plv = Math.min(3, (+(p.dataset.lv || 0)) + 1);
+      [...sub.children].forEach(c => {
+        const li = document.createElement('li');
+        li.dataset.lv = plv;
+        li.textContent = c.textContent;
+        p.after(li);
+      });
+      sub.remove();
+    });
+    [...ul.children].forEach(ch => {
+      if (ch.tagName !== 'LI') {
+        const li = document.createElement('li');
+        li.textContent = ch.textContent;
+        ch.replaceWith(li);
+      }
+    });
+    renumberUl(ul);
+  }
+
+  document.addEventListener('input', e => {
+    if (!helpEditing) return;
+    const ul = helpEditing.querySelector('.help-pop > ul');
+    if (ul && (e.target === ul || ul.contains(e.target))) normalizeHelpUl(ul);
   });
 
   function initHelpEditing() {
