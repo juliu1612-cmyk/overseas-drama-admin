@@ -318,7 +318,7 @@
       </div>
       <div class="help-pop">
         <div class="help-title">供应商管理 / 合集组管理 · 功能交互逻辑</div>
-        <ul><li>合作范围为多选（APP / YT / TT）：勾选后在标签行正下方展示对应范围的授权信息填写区（上下排列）；取消勾选则清空并隐藏该区。</li><li>到期时间支持勾选「永久」：勾选后日期输入框禁用，保存后按「永久」记录并展示。</li><li>列表的授权时间 / 到期时间 / 采买成本按所选范围加前缀分行展示（到期时间为「永久」时直接展示永久）。</li><li>新增 / 编辑：跳转独立页面填写（不再弹窗），页面顶部可返回列表；性别标签、供应商、版权类型、本土/译制为必选项。</li><li>剧本成本：新增字段，单位美元，与出资金额 / IP成本一致支持列表展示与导出导入。</li><li>查询：支持合集组ID、名称、合作范围组合筛选，导出结果与当前查询条件一致。</li><li>导出：按当前查询结果导出 CSV，可下载导入模板。</li><li>导入：带合集组ID → 批量修改；无合集组ID → 批量新增（自动生成ID）。支持选择 CSV 文件或直接从 Excel 复制粘贴。</li></ul>
+        <ul><li>合作范围为多选（APP / YT / TT）：勾选后在标签行正下方展示对应范围的授权信息填写区（上下排列）；取消勾选则清空并隐藏该区。</li><li>到期时间支持勾选「永久」：勾选后日期输入框禁用，保存后按「永久」记录并展示。</li><li>列表的授权时间 / 到期时间 / 采买成本按所选范围加前缀分行展示（到期时间为「永久」时直接展示永久）。</li><li>新增 / 编辑：跳转独立页面填写（不再弹窗），页面顶部可返回列表；性别标签、供应商、合作模式、本土/译制为必选项。</li><li>剧本成本：新增字段，单位美元，与出资金额 / IP成本一致支持列表展示与导出导入。</li><li>查询：支持合集组ID、名称、合作范围组合筛选，导出结果与当前查询条件一致。</li><li>导出：按当前查询结果导出 CSV，可下载导入模板。</li><li>导入：带合集组ID → 批量修改；无合集组ID → 批量新增（自动生成ID）。支持选择 CSV 文件或直接从 Excel 复制粘贴。</li></ul>
         <div class="help-note">鼠标移出即可关闭</div>
       </div>
     </div></div>
@@ -349,7 +349,7 @@
             <th style="width:160px;" data-page-node-id="GM5Rdxogy8DiwHQ2A6dWO1">到期时间</th>
             <th style="width:140px;" data-page-node-id="222bC8q12PI7vZa7WIaOND">采买成本</th>
             <th style="width:100px;" data-page-node-id="zPLFTvwVO6D8Vlt9QpdTT1">供应商</th>
-            <th style="width:90px;" data-page-node-id="IBrVYzbzZFJwOHYn4VpnX8">版权类型</th>
+            <th style="width:90px;" data-page-node-id="IBrVYzbzZFJwOHYn4VpnX8">合作模式</th>
             <th style="width:70px;" data-page-node-id="dC3kHFBrqxHtQPlwXmsy1q">性别</th>
             <th style="width:100px;" data-page-node-id="a3tzkgjVWf46SwfiGDwGQG">上线时间</th>
             <th style="width:100px;" data-page-node-id="rO8FfYuGDTSArhhRwGfV9S">出资金额</th>
@@ -418,7 +418,7 @@
       </div>
       <div class="help-pop">
         <div class="help-title">新增合集组 · 功能交互逻辑</div>
-        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成模式设置：按合作模式分组（不同分组的合作模式不能重复选择：已选模式在其他分组下拉中剔除，保存时二次校验）；每个合作模式分组固定一组分成时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验）：采买可选 利润/流水/消耗/不分成，代理发行可选 流水/消耗/不分成，代运营仅设时间范围（不设置分成范围与分成模式）；「不分成」不设分成比例、只勾选分成范围（至少一个），其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。</li><li>切换分组的合作模式会清空该分组下的分成模式设置（时间范围保留）。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
+        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、合作模式、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成设置：按分成时间范围分组（分组内不再设置合作模式，合作模式为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/消耗/不分成；「不分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
         <div class="help-note">鼠标移出即可关闭</div>
       </div>
     </div></div>
@@ -454,16 +454,16 @@
       </div>
       <div id="scopeSections" data-page-node-id="KVLWrvqqw4ZEyHDbu74kEy"><div class="scope-section hidden" id="sec-APP"><div class="scope-title">APP 授权信息 <span class="badge" style="background:#409eff">APP</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-APP-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-APP-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-APP-end-forever" onclick="toggleForever('APP')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-APP-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div><div class="scope-section hidden" id="sec-YT"><div class="scope-title">YT 授权信息 <span class="badge" style="background:#e6a23c">YT</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-YT-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-YT-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-YT-end-forever" onclick="toggleForever('YT')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-YT-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div><div class="scope-section hidden" id="sec-TT"><div class="scope-title">TT 授权信息 <span class="badge" style="background:#909399">TT</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-TT-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-TT-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-TT-end-forever" onclick="toggleForever('TT')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-TT-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div></div>
       <div class="form-item" data-page-node-id="htShmDRmlrA8hRoSi1HYHs"><label class="form-label" data-page-node-id="kf3Kprf4phLamv2WA2PDWb"><span class="req" data-page-node-id="LM7ZB2zudJpxfMGM9z5HAD">*</span>供应商</label><div class="form-content" data-page-node-id="9cqeHzsR2Dyt4HCBHvhMz2"><select class="input placeholder" id="f-supplier" data-page-node-id="HPL5VMA9QeGQkhRErYWroW"><option value="">请选择</option><option value="华策影视">华策影视</option><option value="柠萌影业">柠萌影业</option><option value="恒星引力">恒星引力</option><option value="新丽传媒">新丽传媒</option><option value="正午阳光">正午阳光</option></select></div></div>
-      <div class="form-item" data-page-node-id="K7Pk0xkM9aoBUskpuGXYbr"><label class="form-label" data-page-node-id="GHWWuFVQ6FYfapR98TPFUn"><span class="req" data-page-node-id="0fBwp1uEkko0CYPRM5AFJj">*</span>版权类型</label><div class="form-content" data-page-node-id="FgO8D8wPdK2Evq61WzK9ee"><select class="input placeholder" id="f-rights" data-page-node-id="BeGQtapCQmhMsU0dCGLwL8"><option value="">请选择</option><option value="独家">独家</option><option value="非独家">非独家</option><option value="代理发行">代理发行</option><option value="买断">买断</option></select></div></div>
+      <div class="form-item" data-page-node-id="K7Pk0xkM9aoBUskpuGXYbr"><label class="form-label" data-page-node-id="GHWWuFVQ6FYfapR98TPFUn"><span class="req" data-page-node-id="0fBwp1uEkko0CYPRM5AFJj">*</span>合作模式</label><div class="form-content" data-page-node-id="FgO8D8wPdK2Evq61WzK9ee"><select class="input placeholder" id="f-rights" data-page-node-id="BeGQtapCQmhMsU0dCGLwL8"><option value="">请选择</option><option value="采买">采买</option><option value="代理发行">代理发行</option><option value="代运营">代运营</option><option value="承制">承制</option><option value="联合出品">联合出品</option></select></div></div>
       <div class="form-item" data-page-node-id="rZoUaiQdSJgLtoct4Hznjm"><label class="form-label" data-page-node-id="cyAK8UmdmVpXiJPLJhFmPZ"><span class="req" data-page-node-id="LAcJMUSqkRAny0ByIhfPSt">*</span>本土/译制</label><div class="form-content" data-page-node-id="IxLL9asxkYN5WWFGgcBFLq"><select class="input placeholder" id="f-localize" data-page-node-id="174tKszD5ZURbv5gCr4LHy"><option value="">请选择</option><option value="本土">本土</option><option value="译制">译制</option></select></div></div>
       <div class="form-item" data-page-node-id="kWeTIoP8ECNY26djGHIAbd"><label class="form-label" data-page-node-id="nJkF9NZcyjvO0emCloPc1C">分成模式设置</label>
         <div class="form-content" data-page-node-id="HHkrlwJnVz9QamKwGobBOh">
           <div class="share-section" data-page-node-id="i2rrezpZAD47cXZZbN2FEJ">
-            <div class="share-head" data-page-node-id="H7qlBKhkUysSPPsCGNHqkR">分成模式设置 <span class="badge" data-page-node-id="zC1cPxOVmxwmjC5wkwm55H">按合作模式分组</span></div>
+            <div class="share-head" data-page-node-id="H7qlBKhkUysSPPsCGNHqkR">分成模式设置 <span class="badge" data-page-node-id="zC1cPxOVmxwmjC5wkwm55H">按时间范围分组</span></div>
             <div id="shareCoops" data-page-node-id="TMi4P5EvVhCAtUV8ChlakM"></div>
             <div class="sh-row" style="padding-bottom:6px;" data-page-node-id="Vuk8SSqjCtwrvMPHHq4fAQ">
-              <button class="btn btn-sm" onclick="addShareCoop()" data-page-node-id="9XjVYFUt0FYfmbWLJ2jN8O">+ 添加合作模式</button>
-              <span class="hint" style="margin:0;" data-page-node-id="kQdePW79xgcjG58uqPzYEt">每个合作模式下可按时间段添加多组分成设置；不同分组下时间段不能重复</span>
+              <button class="btn btn-sm" onclick="addShareCoop()" data-page-node-id="9XjVYFUt0FYfmbWLJ2jN8O">+ 添加分组</button>
+              <span class="hint" style="margin:0;" data-page-node-id="kQdePW79xgcjG58uqPzYEt">按时间范围添加多组分成设置；不同分组下时间段不能重复</span>
             </div>
           </div>
         </div>
@@ -889,7 +889,7 @@
     { key: 'gender',   header: '性别标签', alias: ['性别'] },
     { key: 'first',    header: '是否首发', alias: ['首发'] },
     { key: 'supplier', header: '供应商',   alias: [] },
-    { key: 'rights',   header: '版权类型', alias: ['授权类型'] },
+    { key: 'rights',   header: '合作模式', alias: ['合作模式', '授权类型'] },
     { key: 'localize', header: '本土/译制', alias: ['本土译制', '译制类型'] },
     { key: 'online',   header: '上线时间', alias: [] },
     { key: 'fund',     header: '出资金额', alias: ['出资'] },
@@ -919,7 +919,7 @@
     'f-owner4': ['张敏', '李娜', '王芳', '刘洋', '陈静'],
     'f-gender': ['男频', '女频', '无性别'],
     'f-supplier': ['华策影视', '柠萌影业', '恒星引力', '新丽传媒', '正午阳光'],
-    'f-rights': ['独家', '非独家', '代理发行', '买断'],
+    'f-rights': ['采买', '代理发行', '代运营', '承制', '联合出品'],
     'f-localize': ['本土', '译制']
   };
   function syncSelects() {
@@ -937,7 +937,7 @@
 
   /* ========== 数据 ========== */
   let rows = [
-    { id: 'HJZ-0001', name: '甜宠短剧合集A', scopes: ['APP','YT'], supplier: '华策影视', rights: '独家', localize: '本土', online: '2026-11-05',
+    { id: 'HJZ-0001', name: '甜宠短剧合集A', scopes: ['APP','YT'], supplier: '华策影视', rights: '采买', localize: '本土', online: '2026-11-05',
       gender: '女频', first: '否', fund: '8000', ipcost: '15000', scriptcost: '3000', owner1: '', owner2: '', owner3: '', owner4: '',
       d: { APP:{start:'2026-10-27',end:'2027-10-27',cost:'12900'}, YT:{start:'2026-11-01',end:'2027-11-01',cost:'8500'} },
       share: { coops: [
@@ -948,10 +948,10 @@
           ] }
         ] }
       ] } },
-    { id: 'HJZ-0002', name: '悬疑剧场合集', scopes: ['TT'], supplier: '恒星引力', rights: '非独家', localize: '译制', online: '2026-12-01',
+    { id: 'HJZ-0002', name: '悬疑剧场合集', scopes: ['TT'], supplier: '恒星引力', rights: '代理发行', localize: '译制', online: '2026-12-01',
       gender: '男频', first: '是', fund: '5000', ipcost: '6800', scriptcost: '2000', owner1: '', owner2: '', owner3: '', owner4: '',
       d: { TT:{start:'2026-10-31',end:'永久',cost:'0'} } },
-    { id: 'HJZ-0003', name: '都市情感合集', scopes: ['APP','YT','TT'], supplier: '柠萌影业', rights: '独家', localize: '本土', online: '2026-11-20',
+    { id: 'HJZ-0003', name: '都市情感合集', scopes: ['APP','YT','TT'], supplier: '柠萌影业', rights: '采买', localize: '本土', online: '2026-11-20',
       gender: '女频', first: '否', fund: '12000', ipcost: '12000', scriptcost: '4500', owner1: '', owner2: '', owner3: '', owner4: '',
       d: { APP:{start:'2026-10-15',end:'2027-10-15',cost:'29600'}, YT:{start:'2026-10-18',end:'2027-10-18',cost:'15000'}, TT:{start:'2026-10-20',end:'2027-10-20',cost:'6800'} } }
   ];
@@ -1082,61 +1082,23 @@
     else { el.disabled = false; }
   }
 
-  /* ========== 分成模式设置 ========== */
-  const SHARE_COOPS = ['采买', '代理发行', '代运营'];
+  /* ========== 分成设置（按时间范围分组） ========== */
+  const SHARE_MODES = ['利润', '流水', '消耗', '不分成'];
   const SHARE_SCOPES_ALL = ['APP', '小程序', 'TT端原生', 'Kwai端原生', '社媒'];
   const SHARE_SCOPES_NO_SOCIAL = ['APP', '小程序', 'TT端原生', 'Kwai端原生'];
-  const SHARE_DEF = {
-    '采买':     { modes: ['利润', '流水', '消耗', '不分成'], scopesOf: m => m === '消耗' ? SHARE_SCOPES_NO_SOCIAL : SHARE_SCOPES_ALL },
-    '代理发行': { modes: ['流水', '消耗', '不分成'], scopesOf: () => SHARE_SCOPES_ALL },
-    '代运营':   { modes: [], scopesOf: () => [] }
-  };
+  function scopesOfMode(m) { return m === '消耗' ? SHARE_SCOPES_NO_SOCIAL : SHARE_SCOPES_ALL; }
   let shareSeq = 0;
-  /* 已被其他分组占用的合作模式 */
-  function usedCoops(exceptSel) {
-    return [...document.querySelectorAll('#shareCoops .sh-coop > .sh-row select')]
-      .filter(sel => sel !== exceptSel).map(sel => sel.value).filter(Boolean);
-  }
-  function refreshCoopOptions() {
-    document.querySelectorAll('#shareCoops .sh-coop > .sh-row select').forEach(sel => {
-      const cur = sel.value;
-      const used = usedCoops(sel);
-      const avail = SHARE_COOPS.filter(c => !used.includes(c) || c === cur);
-      sel.innerHTML = '<option value="">请选择</option>' + avail.map(v => `<option value="${v}">${v}</option>`).join('');
-      sel.value = cur;
-    });
-    syncSelects();
-  }
-  function coopOf(el) { return el.closest('.sh-coop').querySelector(':scope > .sh-row select').value; }
-  function shareCoopChange(sel) {
-    const block = sel.closest('.sh-coop');
-    const periodEl = block.querySelector('.sh-period');
-    const hadModes = periodEl.querySelectorAll('.sh-mode-item').length;
-    periodEl.querySelector('.sh-modes').innerHTML = '';
-    if (hadModes) toast('合作模式已切换，该分组下的分成模式设置已清空');
-    refreshPeriodBtn(periodEl);
-    /* 已选模式在其他分组下拉中同步剔除 */
-    refreshCoopOptions();
-  }
   function refreshCoopTitles() {
-    document.querySelectorAll('#shareCoops .sh-coop-title').forEach((t, k) => t.textContent = `合作模式分组 #${k + 1}`);
+    document.querySelectorAll('#shareCoops .sh-coop-title').forEach((t, k) => t.textContent = `分成时间范围分组 #${k + 1}`);
   }
-  function removeShareCoop(el) { el.closest('.sh-coop').remove(); refreshCoopTitles(); refreshCoopOptions(); }
+  function removeShareCoop(el) { el.closest('.sh-coop').remove(); refreshCoopTitles(); }
   function addShareCoop(pref) {
-    if (document.querySelectorAll('#shareCoops .sh-coop').length >= SHARE_COOPS.length) { toast('三种合作模式均已添加分组，不同分组的合作模式不能重复'); return; }
-    const used = usedCoops(null);
-    const avail = SHARE_COOPS.filter(c => !used.includes(c));
-    if (!avail.length) { toast('三种合作模式均已添加分组，不同分组的合作模式不能重复'); return; }
     const i = ++shareSeq;
     const no = document.querySelectorAll('#shareCoops .sh-coop').length + 1;
     document.getElementById('shareCoops').insertAdjacentHTML('beforeend', `
       <div class="sh-coop" data-i="${i}">
-        <div class="sh-coop-head"><span class="sh-coop-title">合作模式分组 #${no}</span><span class="sh-del" onclick="removeShareCoop(this)">删除</span></div>
-        <div class="sh-row"><span class="sh-label"><span class="req">*</span>合作模式</span>
-          <select class="input" onchange="shareCoopChange(this)"><option value="">请选择</option>${avail.map(v => `<option value="${v}">${v}</option>`).join('')}</select>
-</div>
+        <div class="sh-coop-head"><span class="sh-coop-title">分成时间范围分组 #${no}</span><span class="sh-del" onclick="removeShareCoop(this)">删除</span></div>
         <div class="sh-period" data-i="${i}">
-          <div class="sh-period-head"><span class="sh-period-title">分成时间范围</span></div>
           <div class="sh-row"><span class="sh-label"><span class="req">*</span>分成时间范围</span>
           <input class="input" type="month" id="sh-start-${i}" style="width:140px;" placeholder="选择月份"><span class="date-sep">至</span>
           <input class="input" type="month" id="sh-end-${i}" style="width:140px;" placeholder="选择月份">
@@ -1146,9 +1108,6 @@
         </div>
       </div>`);
     if (pref) {
-      const block = document.querySelector(`#shareCoops .sh-coop[data-i="${i}"]`);
-      block.querySelector('select').value = pref.coop || '';
-      refreshPeriodBtn(block.querySelector('.sh-period'));
       const pd = (pref.periods || [pref])[0] || {};
       document.getElementById('sh-start-' + i).value = (pd.start || '').slice(0, 7);
       if (pd.end === '永久') {
@@ -1159,11 +1118,8 @@
       } else {
         document.getElementById('sh-end-' + i).value = (pd.end || '').slice(0, 7);
       }
-      (pd.modes || []).forEach(m => addShareMode(block.querySelector('.sh-addmode'), m));
+      (pd.modes || []).forEach(m => addShareMode(document.querySelector(`#shareCoops .sh-coop[data-i="${i}"] .sh-addmode`), m));
     }
-    const blk = document.querySelector(`#shareCoops .sh-coop[data-i="${i}"]`);
-    refreshPeriodBtn(blk.querySelector('.sh-period'));
-    refreshCoopOptions();
     refreshCoopTitles();
   }
   /* 分成时间范围结束时间：勾选永久 → 禁用结束月输入框 */
@@ -1174,18 +1130,8 @@
     if (cb.checked) { endEl.value = ''; endEl.disabled = true; endEl.classList.remove('err'); }
     else endEl.disabled = false;
   }
-  /* 代运营无分成模式（也不设分成范围）：隐藏添加按钮与模式容器 */
-  function refreshPeriodBtn(periodEl) {
-    if (!periodEl) return;
-    const coop = coopOf(periodEl);
-    const has = coop && SHARE_DEF[coop].modes.length > 0;
-    periodEl.querySelector('.sh-modes').classList.toggle('hidden', !has);
-    periodEl.querySelector('.sh-moderow').classList.toggle('hidden', !has);
-  }
   function addShareMode(btn, pref) {
     const periodEl = btn.closest('.sh-period');
-    const coop = coopOf(btn);
-    const def = SHARE_DEF[coop];
     const j = ++shareSeq;
     const no = periodEl.querySelectorAll('.sh-mode-item').length + 1;
     const modeItem = document.createElement('div');
@@ -1194,20 +1140,20 @@
     modeItem.innerHTML = `
       <div class="sh-mode-head"><span class="sh-mode-title">分成模式 #${no}</span><span class="sh-del" onclick="removeShareMode(this)">删除</span></div>
       <div class="sh-row"><span class="sh-label"><span class="req">*</span>分成模式</span>
-        <select class="input" id="sh-mode-${j}" onchange="shareModeChange(this)"><option value="">请选择</option>${def.modes.map(m => `<option value="${m}">${m}</option>`).join('')}</select>
+        <select class="input" id="sh-mode-${j}" onchange="shareModeChange(this)"><option value="">请选择</option>${SHARE_MODES.map(m => `<option value="${m}">${m}</option>`).join('')}</select>
         <span id="sh-ratiowrap-${j}" style="display:inline-flex;align-items:center;gap:10px;">
           <span class="sh-label"><span class="req">*</span>分成比例</span>
           <span class="unit-wrap" style="width:130px;display:inline-block;"><input class="input" id="sh-ratio-${j}" placeholder="请输入"><span class="unit">%</span></span>
         </span></div>
       <div class="sh-row" id="sh-scoperow-${j}"><span class="sh-label"><span class="req">*</span>分成范围</span>
         <div class="sh-chks" id="sh-scopes-${j}"></div></div>
-      <div class="sh-row" style="padding-top:0;"><span class="hint" style="margin:0 0 0 88px;">同一时间段内不同分成模式的分成范围不能重复勾选</span></div>`;
+      <div class="sh-row" style="padding-top:0;"><span class="hint" style="margin:0 0 0 88px;">同一时间范围内不同分成模式的分成范围不能重复勾选</span></div>`;
     periodEl.querySelector('.sh-modes').appendChild(modeItem);
-    renderShareScopes(j, def.scopesOf(def.modes[0]));
+    renderShareScopes(j, scopesOfMode(SHARE_MODES[0]));
     if (pref) {
       const sel = document.getElementById('sh-mode-' + j);
       sel.value = pref.smode || '';
-      if (sel.value) renderShareScopes(j, def.scopesOf(sel.value));
+      if (sel.value) renderShareScopes(j, scopesOfMode(sel.value));
       if (sel.value === '不分成') {
         /* 不分成：只设分成范围，无分成比例 */
         document.getElementById('sh-ratiowrap-' + j).classList.add('hidden');
@@ -1232,7 +1178,7 @@
     const kept = [...box.querySelectorAll('input:checked')].map(c => c.value).filter(v => opts.includes(v));
     box.innerHTML = opts.map(v => `<label><input type="checkbox" value="${v}" onchange="shareScopeChk(this)" ${kept.includes(v) ? 'checked' : ''}> ${v}</label>`).join('');
   }
-  /* 同一时间段内：已被其他分成模式勾选的分成范围 → 置灰禁选 */
+  /* 同一时间范围内：已被其他分成模式勾选的分成范围 → 置灰禁选 */
   function shareScopeChk(c) {
     const periodEl = c.closest('.sh-period');
     if (c.checked) {
@@ -1240,7 +1186,7 @@
         m !== c.closest('.sh-mode-item') && [...m.querySelectorAll('.sh-chks input:checked')].some(x => x.value === c.value));
       if (taken) {
         c.checked = false;
-        toast(`分成范围「${c.value}」已在该时间段的其他分成模式中勾选，不能重复`);
+        toast(`分成范围「${c.value}」已在该时间范围的其他分成模式中勾选，不能重复`);
         return;
       }
     }
@@ -1261,7 +1207,7 @@
       });
     });
   }
-  /* 同一时间段内：已被其他行选用的分成模式 → 下拉置灰禁选 */
+  /* 同一时间范围内：已被其他行选用的分成模式 → 下拉置灰禁选 */
   function refreshShareModeState(periodEl) {
     if (!periodEl) return;
     const rows = [...periodEl.querySelectorAll('.sh-mode-item')];
@@ -1283,11 +1229,11 @@
       /* 不分成：只设分成范围，无分成比例 */
       ratiowrap.classList.add('hidden');
       scoperow.classList.remove('hidden');
-      if (sel.value) renderShareScopes(j, SHARE_DEF[coopOf(sel)].scopesOf(sel.value));
+      if (sel.value) renderShareScopes(j, scopesOfMode(sel.value));
     } else {
       ratiowrap.classList.remove('hidden');
       scoperow.classList.remove('hidden');
-      if (sel.value) renderShareScopes(j, SHARE_DEF[coopOf(sel)].scopesOf(sel.value));
+      if (sel.value) renderShareScopes(j, scopesOfMode(sel.value));
     }
     refreshShareScopeState(sel.closest('.sh-period'));
     refreshShareModeState(sel.closest('.sh-period'));
@@ -1299,80 +1245,70 @@
     resetShare();
     const sh = r.share;
     if (!sh) return;
-    let list = [];
-    if (sh.coops) {
-      list = sh.coops.map(c => ({ coop: c.coop, periods: c.periods || (c.groups || []).map(g => ({ start: g.start, end: g.end, modes: [g] })) }));
+    let groups = [];
+    if (sh.groups) {
+      groups = sh.groups;
+    } else if (sh.coops) {
+      /* 兼容旧结构（按时间范围分组） */
+      sh.coops.forEach(c => (c.periods || []).forEach(pd => groups.push({ start: pd.start, end: pd.end, modes: pd.modes || [] })));
     } else if (sh.coop) {
-      list = [{ coop: sh.coop, periods: (sh.groups || []).map(g => ({ start: g.start, end: g.end, modes: [g] })) }];
+      (sh.groups || []).forEach(g => groups.push({ start: g.start, end: g.end, modes: [g] }));
     }
-    list.forEach(c => addShareCoop(c));
+    groups.forEach(g => addShareCoop({ periods: [g] }));
   }
   /* 返回 null=未设置；false=校验失败；对象=通过 */
   function collectShare() {
-    const coopEls = [...document.querySelectorAll('#shareCoops .sh-coop')];
-    if (!coopEls.length) return null;
-    const coops = [];
+    const grpEls = [...document.querySelectorAll('#shareCoops .sh-coop')];
+    if (!grpEls.length) return null;
+    const groups = [];
     const spans = [];
-    /* 先统一校验：合作模式必选且不同分组不可重复 */
-    const coopVals = coopEls.map(cEl => cEl.querySelector(':scope > .sh-row select').value);
-    const coopSeen = {};
-    for (let ci = 0; ci < coopVals.length; ci++) {
-      if (!coopVals[ci]) { toast(`合作模式分组 #${ci + 1}：请选择合作模式`); return false; }
-      if (coopSeen[coopVals[ci]] !== undefined) { toast(`合作模式「${coopVals[ci]}」已在分组 #${coopSeen[coopVals[ci]] + 1} 中选择，不同分组不能重复`); return false; }
-      coopSeen[coopVals[ci]] = ci;
-    }
-    for (let ci = 0; ci < coopEls.length; ci++) {
-      const cEl = coopEls[ci];
-      const coop = coopVals[ci];
-      const def = SHARE_DEF[coop];
-      const pEl = cEl.querySelector('.sh-period');
+    for (let gi = 0; gi < grpEls.length; gi++) {
+      const pEl = grpEls[gi].querySelector('.sh-period');
       const i = pEl.dataset.i;
       const start = document.getElementById('sh-start-' + i).value;
       const foreverCb = document.getElementById('sh-forever-' + i);
       const forever = foreverCb && foreverCb.checked;
       const end = forever ? '永久' : document.getElementById('sh-end-' + i).value;
-      if (!start) { toast(`「${coop}」：请填写分成时间范围的开始时间`); return false; }
+      if (!start) { toast(`分组 #${gi + 1}：请填写分成时间范围的开始时间`); return false; }
       if (!forever) {
-        if (!end) { toast(`「${coop}」：请填写完整的分成时间范围（或勾选「永久」）`); return false; }
-        if (end < start) { toast(`「${coop}」：结束时间不能早于开始时间`); return false; }
+        if (!end) { toast(`分组 #${gi + 1}：请填写完整的分成时间范围（或勾选「永久」）`); return false; }
+        if (end < start) { toast(`分组 #${gi + 1}：结束时间不能早于开始时间`); return false; }
         const now = new Date(), ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-        if (end < ym) { toast(`「${coop}」：结束时间不能早于当前月份（${ym}）`); return false; }
+        if (end < ym) { toast(`分组 #${gi + 1}：结束时间不能早于当前月份（${ym}）`); return false; }
       }
-      let modes = [];
-      if (def.modes.length) {
-        const mEls = [...pEl.querySelectorAll('.sh-mode-item')];
-        if (!mEls.length) { toast(`「${coop}」：请至少添加一个分成模式`); return false; }
-        const smodeSeen = {};
-        const scopeSeen = {};
-        for (let mi = 0; mi < mEls.length; mi++) {
-          const mEl = mEls[mi];
-          const j = mEl.dataset.i;
-          const smode = document.getElementById('sh-mode-' + j).value;
-          if (!smode) { toast(`「${coop}」的分成模式 ${mi + 1}：请选择分成模式`); return false; }
-          if (smodeSeen[smode] !== undefined) { toast(`「${coop}」：分成模式「${smode}」已存在，不能重复添加`); return false; }
-          smodeSeen[smode] = mi;
-          let ratio = '', scopes = [];
-          if (smode !== '不分成') {
-            ratio = document.getElementById('sh-ratio-' + j).value.trim();
-            if (!ratio || isNaN(+ratio) || +ratio <= 0 || +ratio > 100) { toast(`「${coop}」「${smode}」：分成比例需为 0~100 的数字`); return false; }
-          }
-          /* 所有分成模式（含「不分成」）均须勾选分成范围 */
-          scopes = [...mEl.querySelectorAll('.sh-chks input:checked')].map(c => c.value);
-          if (!scopes.length) { toast(`「${coop}」「${smode}」：请至少勾选一个分成范围`); return false; }
-          for (const sc of scopes) {
-            if (scopeSeen[sc] !== undefined) {
-              toast(`「${coop}」：分成范围「${sc}」已在「${scopeSeen[sc]}」中勾选，不同分成模式下不能重复`);
-              return false;
-            }
-            scopeSeen[sc] = smode;
-          }
-          modes.push({ smode, ratio, scopes });
+      const mEls = [...pEl.querySelectorAll('.sh-mode-item')];
+      if (!mEls.length) { toast(`分组 #${gi + 1}：请至少添加一个分成模式`); return false; }
+      const smodeSeen = {};
+      const scopeSeen = {};
+      const modes = [];
+      for (let mi = 0; mi < mEls.length; mi++) {
+        const mEl = mEls[mi];
+        const j = mEl.dataset.i;
+        const smode = document.getElementById('sh-mode-' + j).value;
+        if (!smode) { toast(`分组 #${gi + 1} 的分成模式 ${mi + 1}：请选择分成模式`); return false; }
+        if (smodeSeen[smode] !== undefined) { toast(`分组 #${gi + 1}：分成模式「${smode}」已存在，不能重复添加`); return false; }
+        smodeSeen[smode] = mi;
+        let ratio = '', scopes = [];
+        if (smode !== '不分成') {
+          ratio = document.getElementById('sh-ratio-' + j).value.trim();
+          if (!ratio || isNaN(+ratio) || +ratio <= 0 || +ratio > 100) { toast(`分组 #${gi + 1}「${smode}」：分成比例需为 0~100 的数字`); return false; }
         }
+        /* 所有分成模式（含「不分成」）均须勾选分成范围 */
+        scopes = [...mEl.querySelectorAll('.sh-chks input:checked')].map(c => c.value);
+        if (!scopes.length) { toast(`分组 #${gi + 1}「${smode}」：请至少勾选一个分成范围`); return false; }
+        for (const sc of scopes) {
+          if (scopeSeen[sc] !== undefined) {
+            toast(`分组 #${gi + 1}：分成范围「${sc}」已在「${scopeSeen[sc]}」中勾选，不同分成模式下不能重复`);
+            return false;
+          }
+          scopeSeen[sc] = smode;
+        }
+        modes.push({ smode, ratio, scopes });
       }
-      coops.push({ coop, periods: [{ start, end, modes }] });
-      spans.push({ start, end, tag: coop });
+      groups.push({ start, end, modes });
+      spans.push({ start, end, tag: `分组 #${gi + 1}` });
     }
-    /* 时间段不可重叠（不同合作模式分组之间） */
+    /* 时间段不可重叠（不同分组之间） */
     const sorted = spans.slice().sort((x, y) => x.start < y.start ? -1 : 1);
     for (let k = 1; k < sorted.length; k++) {
       if (sorted[k].start <= sorted[k - 1].end) {
@@ -1380,7 +1316,7 @@
         return false;
       }
     }
-    return { coops };
+    return { groups };
   }
   const FORM_IDS = ['f-name','f-owner1','f-owner2','f-owner3','f-owner4','f-gender','f-supplier','f-rights','f-localize','f-online','f-fund','f-ipcost','f-scriptcost'];
   function resetForm() {
@@ -1452,7 +1388,7 @@
     if (!name) { document.getElementById('f-name').classList.add('err'); toast('请填写名称'); return; }
     if (!name) return;
     if (rows.some((r, i) => r.name === name && i !== editIndex)) { document.getElementById('f-name').classList.add('err'); toast('名称已存在'); return; }
-    const REQUIRED_SELECTS = [['f-gender', '性别标签'], ['f-supplier', '供应商'], ['f-rights', '版权类型'], ['f-localize', '本土/译制']];
+    const REQUIRED_SELECTS = [['f-gender', '性别标签'], ['f-supplier', '供应商'], ['f-rights', '合作模式'], ['f-localize', '本土/译制']];
     for (const [id, label] of REQUIRED_SELECTS) {
       const el = document.getElementById(id);
       if (!el.value) { el.classList.add('err'); toast(`请选择「${label}」`); return; }
@@ -1534,7 +1470,7 @@
       if (c.key === 'gender') return '女频';
       if (c.key === 'first') return '否';
       if (c.key === 'supplier') return '示例供应商';
-      if (c.key === 'rights') return '独家';
+      if (c.key === 'rights') return '采买';
       if (c.key === 'localize') return '本土';
       if (/\.start$/.test(c.key) && scopes.includes(c.key.split('.')[0])) return '2026-11-01';
       if (/\.end$/.test(c.key) && scopes.includes(c.key.split('.')[0])) return '2027-11-01';
@@ -1784,7 +1720,7 @@
       '合作范围为多选（APP / YT / TT）：勾选后在标签行正下方展示对应范围的授权信息填写区（上下排列）；取消勾选则清空并隐藏该区。',
       '到期时间支持勾选「永久」：勾选后日期输入框禁用，保存后按「永久」记录并展示。',
       '列表的授权时间 / 到期时间 / 采买成本按所选范围加前缀分行展示（到期时间为「永久」时直接展示永久）。',
-      '新增 / 编辑：跳转独立页面填写（不再弹窗），页面顶部可返回列表；性别标签、供应商、版权类型、本土/译制为必选项。',
+      '新增 / 编辑：跳转独立页面填写（不再弹窗），页面顶部可返回列表；性别标签、供应商、合作模式、本土/译制为必选项。',
       '剧本成本：新增字段，单位美元，与出资金额 / IP成本一致支持列表展示与导出导入。',
       '查询：支持合集组ID、名称、合作范围组合筛选，导出结果与当前查询条件一致。',
       '导出：按当前查询结果导出 CSV，可下载导入模板。',
@@ -1795,12 +1731,11 @@
       '合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。',
       '合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。',
       '每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。',
-      '必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。',
+      '必填校验：名称（唯一）、性别标签、供应商、合作模式、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。',
       '剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。',
-      '分成模式设置：按合作模式分组（不同分组的合作模式不能重复选择：已选模式在其他分组下拉中剔除，保存时二次校验）；每个合作模式分组固定一组分成时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。',
-      '每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验）：采买可选 利润/流水/消耗/不分成，代理发行可选 流水/消耗/不分成，代运营仅设时间范围（不设置分成范围与分成模式）；「不分成」不设分成比例、只勾选分成范围（至少一个），其余分成模式单独设置分成比例（0~100）与分成范围。',
+      '分成设置：按分成时间范围分组（分组内不再设置合作模式，合作模式为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。',
+      '每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/消耗/不分成；「不分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。',
       '同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。',
-      '切换分组的合作模式会清空该分组下的分成模式设置（时间范围保留）。',
       '「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。'
     ],
     '新首页': [
