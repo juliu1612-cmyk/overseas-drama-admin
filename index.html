@@ -196,6 +196,12 @@
   .panel-help.editing .help-pop .help-title::after { content: '编辑中'; margin-left: auto; font-size: 11px; font-weight: 400; color: #e6a23c; background: #fdf6ec; border: 1px solid #faecd8; border-radius: 10px; padding: 0 6px; line-height: 16px; }
   .help-editbar .btn { height: 24px; padding: 0 8px; font-size: 12px; line-height: 22px; }
   .help-editbar .hint { font-size: 11px; color: #909399; flex: 1 1 100%; }
+  /* 字体颜色快速选择 */
+  .help-editbar .colorbar { display: flex; align-items: center; gap: 6px; flex: 1 1 100%; }
+  .help-editbar .colorbar .cbar-label { font-size: 11px; color: #909399; }
+  .help-editbar .colorbar i { width: 16px; height: 16px; border-radius: 50%; border: 1px solid rgba(0,0,0,.08); cursor: pointer; box-sizing: border-box; transition: transform .12s; }
+  .help-editbar .colorbar i:hover { transform: scale(1.18); }
+  .help-editbar .colorbar i.clear { background: #fff; color: #909399; font-style: normal; font-size: 11px; line-height: 14px; text-align: center; border-color: #dcdfe6; }
   #helpExportText { width: 100%; height: 330px; margin-top: 8px; padding: 10px; border: 1px solid #dcdfe6; border-radius: 4px; font-family: Menlo, Consolas, monospace; font-size: 12px; line-height: 1.65; color: #303133; background: #fafafa; resize: vertical; box-sizing: border-box; }
   /* 内容列表 / 短剧管理页面 */
   .search-card { padding: 18px 20px 14px; }
@@ -2837,11 +2843,27 @@
     return key;
   }
 
-  /* 条目：{ t: 文本, lv: 层级 0~3 }；旧格式（纯字符串）= 顶层 */
+  /* 条目：{ t: 文本, lv: 层级 0~3, c: 字体颜色(可选) }；旧格式（纯字符串）= 顶层 */
+  function helpSafeColor(v) {
+    const s = String(v || '').trim();
+    if (/^#[0-9a-f]{3,8}$/i.test(s)) return s.toLowerCase();
+    if (/^rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(,\s*[\d.]+\s*)?\)$/.test(s)) return s;
+    return '';
+  }
+
+  function helpRgbToHex(c) {
+    const m = /^rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/.exec(String(c || ''));
+    if (!m) return '';
+    return '#' + [1, 2, 3].map(i => (+m[i]).toString(16).padStart(2, '0')).join('');
+  }
+
   function normalizeHelpItems(items) {
     return (items || []).map(it => {
       if (typeof it === 'string') return { t: it.trim(), lv: 0 };
-      return { t: String(it.t || '').trim(), lv: Math.max(0, Math.min(3, +it.lv || 0)) };
+      const o = { t: String(it.t || '').trim(), lv: Math.max(0, Math.min(3, +it.lv || 0)) };
+      const c = helpSafeColor(it.c);
+      if (c) o.c = c;
+      return o;
     }).filter(x => x.t);
   }
 
@@ -2864,7 +2886,14 @@
     if (!ul) return [];
     return [...ul.children]
       .filter(li => li.tagName === 'LI')
-      .map(li => ({ t: li.textContent.trim(), lv: Math.min(3, +(li.dataset.lv || 0)) }))
+      .map(li => {
+        const sp = li.querySelector('[style*="color"]');
+        const raw = li.style.color || (sp ? sp.style.color : '');
+        const o = { t: li.textContent.trim(), lv: Math.min(3, +(li.dataset.lv || 0)) };
+        const c = helpSafeColor(helpRgbToHex(raw) || raw);
+        if (c) o.c = c;
+        return o;
+      })
       .filter(x => x.t);
   }
 
@@ -2872,7 +2901,7 @@
     const ul = h.querySelector('.help-pop > ul');
     if (!ul) return;
     ul.innerHTML = normalizeHelpItems(items).map(it =>
-      '<li data-lv="' + it.lv + '">' + helpEscape(it.t) + '</li>').join('');
+      '<li data-lv="' + it.lv + '"' + (it.c ? ' style="color:' + it.c + '"' : '') + '>' + helpEscape(it.t) + '</li>').join('');
     renumberUl(ul);
   }
 
@@ -2886,8 +2915,20 @@
     });
   }
 
+  /* 常用字体颜色（点色块作用于光标所在的那一条） */
+  const HELP_COLORS = ['#606266', '#f56c6c', '#e6a23c', '#67c23a', '#1677ff', '#8e44ad', '#909399'];
+  let helpColorTarget = null;
+
+  const HELP_COLORBAR = '<div class="colorbar">'
+    + '<span class="cbar-label">字体颜色</span>'
+    + HELP_COLORS.map(c => '<i data-c="' + c + '" style="background:' + c + '" title="' + c
+        + '" onmousedown="helpColorDown(event)" onclick="applyHelpColor(\'' + c + '\')"></i>').join('')
+    + '<i class="clear" title="清除颜色" onmousedown="helpColorDown(event)" onclick="applyHelpColor(\'\')">×</i>'
+    + '</div>';
+
   const HELP_EDITBAR = '<div class="help-editbar">'
     + '<span class="hint">直接改文字；回车新增一条，Tab 加层级、Shift+Tab 减层级（多级编号：1. / 1.1 / 1.1.1）</span>'
+    + HELP_COLORBAR
     + '<button class="btn btn-sm" onclick="addHelpLine()">+ 条目</button>'
     + '<button class="btn btn-sm" onclick="restoreHelpDefault()">恢复默认</button>'
     + '<button class="btn btn-sm" onclick="openHelpExport()">复制全部</button>'
@@ -2895,6 +2936,27 @@
     + '<button class="btn btn-sm" onclick="cancelHelpEdit()">取 消</button>'
     + '<button class="btn btn-primary btn-sm" onclick="finishHelpEdit()">完 成</button>'
     + '</div>';
+
+  /* 点色块会让编辑区失焦，先记住光标所在条目 */
+  function helpColorDown(e) {
+    e.preventDefault();
+    const ul = helpEditing && helpEditing.querySelector('.help-pop > ul');
+    if (!ul) return;
+    const info = helpCaretInfo(ul);
+    if (info) helpColorTarget = info.li;
+  }
+
+  function applyHelpColor(c) {
+    const ul = helpEditing && helpEditing.querySelector('.help-pop > ul');
+    if (!ul) return;
+    let li = (helpColorTarget && ul.contains(helpColorTarget)) ? helpColorTarget : null;
+    if (!li) { const info = helpCaretInfo(ul); li = info && info.li; }
+    if (!li) { toast('请先把光标放到要改色的那一条说明里'); return; }
+    if (c) li.style.color = c; else li.removeAttribute('style');
+    helpColorTarget = li;
+    ul.focus();
+    placeCaretEnd(li);
+  }
 
   function enterHelpEdit(h) {
     if (helpEditing === h) return;
@@ -2927,7 +2989,9 @@
     const items = normalizeHelpItems(helpItemsOf(h));
     if (!items.length) { toast('至少保留一条说明内容'); return; }
     const key = helpKeyOf(h);
-    helpOverrides[key] = items.map(it => it.lv > 0 ? { t: it.t, lv: it.lv } : it.t);
+    helpOverrides[key] = items.map(it => (it.lv > 0 || it.c)
+      ? Object.assign({ t: it.t, lv: it.lv }, it.c ? { c: it.c } : {})
+      : it.t);
     try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
     exitHelpEditUI(h);
     fillHelpUl(h, items);
@@ -2971,7 +3035,9 @@
     const all = {};
     Object.keys(HELP_DEFAULTS).forEach(k => {
       const arr = normalizeHelpItems((helpOverrides[k] && helpOverrides[k].length) ? helpOverrides[k] : HELP_DEFAULTS[k]);
-      all[k] = arr.map(it => it.lv > 0 ? { t: it.t, lv: it.lv } : it.t);
+      all[k] = arr.map(it => (it.lv > 0 || it.c)
+        ? Object.assign({ t: it.t, lv: it.lv }, it.c ? { c: it.c } : {})
+        : it.t);
     });
     return JSON.stringify(all, null, 2);
   }
