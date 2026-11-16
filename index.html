@@ -903,7 +903,7 @@
     </div>
     <div class="dialog-footer">
       <button class="btn" onclick="closeHelpAuth()">取 消</button>
-      <button class="btn btn-primary" onclick="confirmHelpAuth()">确 定</button>
+      <button class="btn btn-primary" id="helpAuthOkBtn" onclick="confirmHelpAuth()">确 定</button>
     </div>
   </div>
 </div>
@@ -2802,7 +2802,11 @@
      - 部署在服务器上时：保存自动同步云端，所有人 5 秒内看到最新文案
      - 本地 / GitHub Pages 打开时：修改保存在本机浏览器；「复制全部」可导出文案给开发者更新线上
      ========================================================== */
-  const HELP_EDIT_PASS = 'drama2026';   /* ← 编辑口令（想换口令改这里） */
+  /* 口令只存在服务器上（页面里不再有密码）；这里只保存登录后拿到的通行证 sid */
+  const HELP_SID_KEY = 'dramaHelpSid_v1';
+  var helpSid = (function () { try { return localStorage.getItem(HELP_SID_KEY) || ''; } catch (e) { return ''; } })();
+  /* 离线打开（file:// / GitHub Pages）时如需临时编辑，可在控制台设 window.HELP_OFFLINE_PASS = 'xxx' */
+  var HELP_OFFLINE_PASS = (typeof window.HELP_OFFLINE_PASS === 'string') ? window.HELP_OFFLINE_PASS : '';
   const HELP_OWNER_KEY = 'dramaHelpOwner_v1';
   const HELP_DATA_KEY = 'dramaHelpData_v1';
   const HELP_DEFAULTS = {};             /* 各页面原始文案，用于「恢复默认」 */
@@ -3163,7 +3167,7 @@
     m.classList.remove('hidden');
     document.getElementById('helpAuthPwd').value = '';
     const hint = document.getElementById('helpAuthHint');
-    hint.textContent = '校验通过后，仅在此设备（本机浏览器）开启编辑入口，其他设备只能查看。';
+    hint.textContent = '口令由服务器校验（页面里没有密码）；通过后仅在此设备（本机浏览器）开启编辑入口。';
     hint.style.color = '#909399';
     setTimeout(() => document.getElementById('helpAuthPwd').focus(), 50);
   }
@@ -3172,19 +3176,48 @@
     document.getElementById('helpAuthMask').classList.add('hidden');
   }
 
-  function confirmHelpAuth() {
-    const v = document.getElementById('helpAuthPwd').value.trim();
-    if (v !== HELP_EDIT_PASS) {
-      const hint = document.getElementById('helpAuthHint');
-      hint.textContent = '口令不正确，请重试。';
-      hint.style.color = '#f56c6c';
-      return;
-    }
+  function helpAuthHintTxt(msg) {
+    const hint = document.getElementById('helpAuthHint');
+    hint.textContent = msg;
+    hint.style.color = '#f56c6c';
+  }
+
+  function helpAuthOk() {
     helpOwner = true;
     try { localStorage.setItem(HELP_OWNER_KEY, helpFingerprint()); } catch (e) {}
     closeHelpAuth();
     markHelpOwnerUI();
     toast('已开启编辑：双击任意「交互说明」即可修改');
+  }
+
+  /* 口令校验由服务器完成（页面里没有任何密码）；离线打开时仅支持开发者临时口令 */
+  function confirmHelpAuth() {
+    const v = document.getElementById('helpAuthPwd').value.trim();
+    if (!v) { helpAuthHintTxt('请输入编辑口令。'); return; }
+    if (!HELP_SYNC_URL) {
+      if (HELP_OFFLINE_PASS && v === HELP_OFFLINE_PASS) { helpAuthOk(); return; }
+      helpAuthHintTxt('当前是离线打开（无服务器），口令只能在服务器版页面校验。');
+      return;
+    }
+    const btn = document.getElementById('helpAuthOkBtn');
+    if (btn) btn.disabled = true;
+    fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pwd: v })
+    })
+      .then(r => r.json().then(j => ({ ok: r.ok, j: j })).catch(() => ({ ok: r.ok, j: null })))
+      .then(res => {
+        if (res.ok && res.j && res.j.ok) {
+          helpSid = res.j.sid || '';
+          try { localStorage.setItem(HELP_SID_KEY, helpSid); } catch (e) {}
+          helpAuthOk();
+        } else {
+          helpAuthHintTxt((res.j && res.j.error) || '口令不正确，请重试。');
+        }
+      })
+      .catch(() => helpAuthHintTxt('无法连接服务器，请检查网络后重试。'))
+      .then(() => { if (btn) btn.disabled = false; });
   }
 
   function exitHelpOwner() {
@@ -3346,13 +3379,23 @@
     try { data = JSON.parse(helpExportJson()); } catch (e) { toast('交互说明已保存'); return; }
     fetch(HELP_SYNC_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: HELP_EDIT_PASS, data: data })
+      headers: { 'Content-Type': 'application/json', 'X-Help-Sid': helpSid || '' },
+      body: JSON.stringify({ data: data })
     })
       .then(r => r.json().then(j => ({ ok: r.ok, j: j })).catch(() => ({ ok: r.ok, j: null })))
       .then(res => {
-        if (res.ok && res.j && res.j.ok) { helpRemoteStamp = res.j.updatedAt; toast('已保存并同步到服务器，其他人几秒内可见'); }
-        else toast('本机已保存，云端同步失败：' + ((res.j && res.j.error) || '接口异常'));
+        if (res.ok && res.j && res.j.ok) {
+          helpRemoteStamp = res.j.updatedAt;
+          toast('已保存并同步到服务器，其他人几秒内可见');
+          return;
+        }
+        if (res.ok === false && res.j && /过期|口令/.test(res.j.error || '')) {
+          helpSid = '';
+          try { localStorage.removeItem(HELP_SID_KEY); } catch (e) {}
+          toast('登录已过期，请重新输入编辑口令后再保存');
+          return;
+        }
+        toast('本机已保存，云端同步失败：' + ((res.j && res.j.error) || '接口异常'));
       })
       .catch(() => toast('本机已保存，云端同步失败（网络异常）'));
   }
