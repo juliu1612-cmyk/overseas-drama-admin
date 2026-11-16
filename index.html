@@ -2843,7 +2843,8 @@
     return key;
   }
 
-  /* 条目：{ t: 文本, lv: 层级 0~3, c: 字体颜色(可选) }；旧格式（纯字符串）= 顶层 */
+  /* 条目：{ t: 文本, lv: 层级 0~3, c: 整条颜色(可选), r: 片段颜色(可选) }
+     r = [{ v: '文字', c: '#hex' }]；旧格式（纯字符串）= 顶层无颜色 */
   function helpSafeColor(v) {
     const s = String(v || '').trim();
     if (/^#[0-9a-f]{3,8}$/i.test(s)) return s.toLowerCase();
@@ -2857,12 +2858,60 @@
     return '#' + [1, 2, 3].map(i => (+m[i]).toString(16).padStart(2, '0')).join('');
   }
 
+  /* 把 li 的 DOM 拆成 [{v, c}] 片段（支持选中文字局部染色后的嵌套 span） */
+  function helpRunsOf(li, base) {
+    const runs = [];
+    const push = (txt, c) => {
+      if (!txt) return;
+      const last = runs[runs.length - 1];
+      if (last && (last.c || '') === (c || '')) last.v += txt;
+      else runs.push(c ? { v: txt, c: c } : { v: txt });
+    };
+    const walk = (node, inherited) => {
+      [...node.childNodes].forEach(n => {
+        if (n.nodeType === 3) { push(n.nodeValue, inherited); return; }
+        if (n.nodeType !== 1) return;
+        if (n.tagName === 'BR') { push(' ', inherited); return; }
+        let c = inherited;
+        const attrColor = n.getAttribute('color');
+        if (n.style && n.style.color) {
+          const h = helpSafeColor(helpRgbToHex(n.style.color) || n.style.color);
+          if (h) c = h;
+        } else if (attrColor) {
+          const h = helpSafeColor(attrColor) || helpSafeColor(helpRgbToHex(attrColor));
+          if (h) c = h;
+        }
+        walk(n, c);
+      });
+    };
+    walk(li, base || '');
+    return runs;
+  }
+
+  function helpNormRuns(r) {
+    if (!Array.isArray(r)) return null;
+    const out = [];
+    r.forEach(x => {
+      if (!x || typeof x.v !== 'string' || !x.v) return;
+      const o = { v: x.v };
+      const c = helpSafeColor(x.c);
+      if (c) o.c = c;
+      out.push(o);
+    });
+    return out.length ? out : null;
+  }
+
   function normalizeHelpItems(items) {
     return (items || []).map(it => {
       if (typeof it === 'string') return { t: it.trim(), lv: 0 };
       const o = { t: String(it.t || '').trim(), lv: Math.max(0, Math.min(3, +it.lv || 0)) };
       const c = helpSafeColor(it.c);
       if (c) o.c = c;
+      const runs = helpNormRuns(it.r);
+      if (runs) {
+        o.r = runs;
+        if (!o.t) o.t = runs.map(x => x.v).join('').trim();
+      }
       return o;
     }).filter(x => x.t);
   }
@@ -2887,11 +2936,20 @@
     return [...ul.children]
       .filter(li => li.tagName === 'LI')
       .map(li => {
-        const sp = li.querySelector('[style*="color"]');
-        const raw = li.style.color || (sp ? sp.style.color : '');
-        const o = { t: li.textContent.trim(), lv: Math.min(3, +(li.dataset.lv || 0)) };
-        const c = helpSafeColor(helpRgbToHex(raw) || raw);
-        if (c) o.c = c;
+        const base = helpSafeColor(helpRgbToHex(li.style.color) || li.style.color) || '';
+        const runs = helpRunsOf(li, base);
+        const o = { t: runs.map(x => x.v).join('').trim(), lv: Math.min(3, +(li.dataset.lv || 0)) };
+        /* 判断能否压成整条颜色：所有带色片段颜色一致 */
+        const colored = runs.filter(x => x.c);
+        const same = colored.length > 0 && colored.every(x => x.c === colored[0].c);
+        if (colored.length && same && colored.length === runs.filter(x => x.v.trim()).length) {
+          o.c = colored[0].c;
+        } else if (colored.length) {
+          o.r = runs.map(x => x.c ? { v: x.v, c: x.c } : { v: x.v });
+          if (base) o.c = base;
+        } else if (base) {
+          o.c = base;
+        }
         return o;
       })
       .filter(x => x.t);
@@ -2900,8 +2958,13 @@
   function fillHelpUl(h, items) {
     const ul = h.querySelector('.help-pop > ul');
     if (!ul) return;
-    ul.innerHTML = normalizeHelpItems(items).map(it =>
-      '<li data-lv="' + it.lv + '"' + (it.c ? ' style="color:' + it.c + '"' : '') + '>' + helpEscape(it.t) + '</li>').join('');
+    ul.innerHTML = normalizeHelpItems(items).map(it => {
+      const base = it.c || '';
+      const inner = it.r
+        ? it.r.map(x => x.c ? '<span style="color:' + x.c + '">' + helpEscape(x.v) + '</span>' : helpEscape(x.v)).join('')
+        : helpEscape(it.t);
+      return '<li data-lv="' + it.lv + '"' + (base ? ' style="color:' + base + '"' : '') + '>' + inner + '</li>';
+    }).join('');
     renumberUl(ul);
   }
 
@@ -2927,7 +2990,7 @@
     + '</div>';
 
   const HELP_EDITBAR = '<div class="help-editbar">'
-    + '<span class="hint">直接改文字；回车新增一条，Tab 加层级、Shift+Tab 减层级（多级编号：1. / 1.1 / 1.1.1）</span>'
+    + '<span class="hint">直接改文字；回车新增一条，Tab 加层级、Shift+Tab 减层级（多级编号：1. / 1.1 / 1.1.1）；选中文字点色块＝只染选中的字，不选则整条染色</span>'
     + HELP_COLORBAR
     + '<button class="btn btn-sm" onclick="addHelpLine()">+ 条目</button>'
     + '<button class="btn btn-sm" onclick="restoreHelpDefault()">恢复默认</button>'
@@ -2949,6 +3012,19 @@
   function applyHelpColor(c) {
     const ul = helpEditing && helpEditing.querySelector('.help-pop > ul');
     if (!ul) return;
+    /* 有选中文字 → 只染选中的部分；无选中 → 整条染色 */
+    const sel = window.getSelection();
+    const hasSel = sel && sel.rangeCount && !sel.isCollapsed
+      && sel.anchorNode && sel.focusNode
+      && ul.contains(sel.anchorNode) && ul.contains(sel.focusNode);
+    if (hasSel) {
+      try {
+        document.execCommand('styleWithCSS', false, true);
+        if (c) document.execCommand('foreColor', false, c);
+        else document.execCommand('removeFormat', false, null);
+      } catch (e) {}
+      return;
+    }
     let li = (helpColorTarget && ul.contains(helpColorTarget)) ? helpColorTarget : null;
     if (!li) { const info = helpCaretInfo(ul); li = info && info.li; }
     if (!li) { toast('请先把光标放到要改色的那一条说明里'); return; }
@@ -2989,9 +3065,13 @@
     const items = normalizeHelpItems(helpItemsOf(h));
     if (!items.length) { toast('至少保留一条说明内容'); return; }
     const key = helpKeyOf(h);
-    helpOverrides[key] = items.map(it => (it.lv > 0 || it.c)
-      ? Object.assign({ t: it.t, lv: it.lv }, it.c ? { c: it.c } : {})
-      : it.t);
+    helpOverrides[key] = items.map(it => {
+      if (!(it.lv > 0 || it.c || it.r)) return it.t;
+      const o = { t: it.t, lv: it.lv };
+      if (it.c) o.c = it.c;
+      if (it.r) o.r = it.r;
+      return o;
+    });
     try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
     exitHelpEditUI(h);
     fillHelpUl(h, items);
@@ -3035,9 +3115,13 @@
     const all = {};
     Object.keys(HELP_DEFAULTS).forEach(k => {
       const arr = normalizeHelpItems((helpOverrides[k] && helpOverrides[k].length) ? helpOverrides[k] : HELP_DEFAULTS[k]);
-      all[k] = arr.map(it => (it.lv > 0 || it.c)
-        ? Object.assign({ t: it.t, lv: it.lv }, it.c ? { c: it.c } : {})
-        : it.t);
+      all[k] = arr.map(it => {
+        if (!(it.lv > 0 || it.c || it.r)) return it.t;
+        const o = { t: it.t, lv: it.lv };
+        if (it.c) o.c = it.c;
+        if (it.r) o.r = it.r;
+        return o;
+      });
     });
     return JSON.stringify(all, null, 2);
   }
