@@ -364,7 +364,7 @@
             <th style="width:160px;" data-page-node-id="GM5Rdxogy8DiwHQ2A6dWO1">到期时间</th>
             <th style="width:140px;" data-page-node-id="222bC8q12PI7vZa7WIaOND">采买成本</th>
             <th style="width:100px;" data-page-node-id="zPLFTvwVO6D8Vlt9QpdTT1">供应商</th>
-            <th style="width:90px;" data-page-node-id="IBrVYzbzZFJwOHYn4VpnX8">合作模式</th>
+            <th style="width:90px;" data-page-node-id="IBrVYzbzZFJwOHYn4VpnX8">版权类型</th>
             <th style="width:70px;" data-page-node-id="dC3kHFBrqxHtQPlwXmsy1q">性别</th>
             <th style="width:100px;" data-page-node-id="a3tzkgjVWf46SwfiGDwGQG">上线时间</th>
             <th style="width:100px;" data-page-node-id="rO8FfYuGDTSArhhRwGfV9S">出资金额</th>
@@ -433,7 +433,7 @@
       </div>
       <div class="help-pop">
         <div class="help-title">新增合集组 · 功能交互逻辑</div>
-        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、合作模式、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成设置：按分成时间范围分组（分组内不再设置合作模式，合作模式为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
+        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成设置：按分成时间范围分组（分组内不再设置版权类型，版权类型为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
         <div class="help-note">鼠标移出即可关闭</div>
       </div>
     </div></div>
@@ -469,7 +469,7 @@
       </div>
       <div id="scopeSections" data-page-node-id="KVLWrvqqw4ZEyHDbu74kEy"><div class="scope-section hidden" id="sec-APP"><div class="scope-title">APP 授权信息 <span class="badge" style="background:#409eff">APP</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-APP-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-APP-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-APP-end-forever" onclick="toggleForever('APP')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>APP采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-APP-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div><div class="scope-section hidden" id="sec-YT"><div class="scope-title">YT 授权信息 <span class="badge" style="background:#e6a23c">YT</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-YT-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-YT-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-YT-end-forever" onclick="toggleForever('YT')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>社媒采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-YT-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div><div class="scope-section hidden" id="sec-TT"><div class="scope-title">TT 授权信息 <span class="badge" style="background:#909399">TT</span></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT授权时间</label><div class="form-content"><div class="date-row"><input class="input" type="date" id="f-TT-start"><span class="date-icon">📅</span></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT到期时间</label><div class="form-content"><div class="end-wrap"><div class="date-row"><input class="input" type="date" id="f-TT-end"><span class="date-icon">📅</span></div><label class="forever-check"><input type="checkbox" id="f-TT-end-forever" onclick="toggleForever('TT')"> 永久</label></div></div></div><div class="form-item" style="margin-bottom:12px;"><label class="form-label" style="width:110px;"><span class="req">*</span>TT采买成本</label><div class="form-content"><div class="unit-wrap"><input class="input" id="f-TT-cost" placeholder="请输入"><span class="unit">美元</span></div></div></div></div></div>
       <div class="form-item" data-page-node-id="htShmDRmlrA8hRoSi1HYHs"><label class="form-label" data-page-node-id="kf3Kprf4phLamv2WA2PDWb"><span class="req" data-page-node-id="LM7ZB2zudJpxfMGM9z5HAD">*</span>供应商</label><div class="form-content" data-page-node-id="9cqeHzsR2Dyt4HCBHvhMz2"><select class="input placeholder" id="f-supplier" data-page-node-id="HPL5VMA9QeGQkhRErYWroW"><option value="">请选择</option><option value="华策影视">华策影视</option><option value="柠萌影业">柠萌影业</option><option value="恒星引力">恒星引力</option><option value="新丽传媒">新丽传媒</option><option value="正午阳光">正午阳光</option></select></div></div>
-      <div class="form-item" data-page-node-id="K7Pk0xkM9aoBUskpuGXYbr"><label class="form-label" data-page-node-id="GHWWuFVQ6FYfapR98TPFUn"><span class="req" data-page-node-id="0fBwp1uEkko0CYPRM5AFJj">*</span>合作模式</label><div class="form-content" data-page-node-id="FgO8D8wPdK2Evq61WzK9ee"><select class="input placeholder" id="f-rights" data-page-node-id="BeGQtapCQmhMsU0dCGLwL8"><option value="">请选择</option><option value="采买">采买</option><option value="代理发行">代理发行</option><option value="代运营">代运营</option><option value="承制">承制</option><option value="联合出品">联合出品</option></select></div></div>
+      <div class="form-item" data-page-node-id="K7Pk0xkM9aoBUskpuGXYbr"><label class="form-label" data-page-node-id="GHWWuFVQ6FYfapR98TPFUn"><span class="req" data-page-node-id="0fBwp1uEkko0CYPRM5AFJj">*</span>版权类型</label><div class="form-content" data-page-node-id="FgO8D8wPdK2Evq61WzK9ee"><select class="input placeholder" id="f-rights" data-page-node-id="BeGQtapCQmhMsU0dCGLwL8"><option value="">请选择</option><option value="采买">采买</option><option value="代理发行">代理发行</option><option value="代运营">代运营</option><option value="承制">承制</option><option value="联合出品">联合出品</option></select></div></div>
       <div class="form-item" data-page-node-id="rZoUaiQdSJgLtoct4Hznjm"><label class="form-label" data-page-node-id="cyAK8UmdmVpXiJPLJhFmPZ"><span class="req" data-page-node-id="LAcJMUSqkRAny0ByIhfPSt">*</span>本土/译制</label><div class="form-content" data-page-node-id="IxLL9asxkYN5WWFGgcBFLq"><select class="input placeholder" id="f-localize" data-page-node-id="174tKszD5ZURbv5gCr4LHy"><option value="">请选择</option><option value="本土">本土</option><option value="译制">译制</option></select></div></div>
       <div class="form-item" data-page-node-id="kWeTIoP8ECNY26djGHIAbd"><label class="form-label" data-page-node-id="nJkF9NZcyjvO0emCloPc1C">分成模式设置</label>
         <div class="form-content" data-page-node-id="HHkrlwJnVz9QamKwGobBOh">
@@ -936,7 +936,7 @@
     { key: 'gender',   header: '性别标签', alias: ['性别'] },
     { key: 'first',    header: '是否首发', alias: ['首发'] },
     { key: 'supplier', header: '供应商',   alias: [] },
-    { key: 'rights',   header: '合作模式', alias: ['合作模式', '授权类型'] },
+    { key: 'rights',   header: '版权类型', alias: ['版权类型', '合作模式', '授权类型'] },
     { key: 'localize', header: '本土/译制', alias: ['本土译制', '译制类型'] },
     { key: 'online',   header: '上线时间', alias: [] },
     { key: 'fund',     header: '出资金额', alias: ['出资'] },
@@ -1437,7 +1437,7 @@
     if (!name) { document.getElementById('f-name').classList.add('err'); toast('请填写名称'); return; }
     if (!name) return;
     if (rows.some((r, i) => r.name === name && i !== editIndex)) { document.getElementById('f-name').classList.add('err'); toast('名称已存在'); return; }
-    const REQUIRED_SELECTS = [['f-gender', '性别标签'], ['f-supplier', '供应商'], ['f-rights', '合作模式'], ['f-localize', '本土/译制']];
+    const REQUIRED_SELECTS = [['f-gender', '性别标签'], ['f-supplier', '供应商'], ['f-rights', '版权类型'], ['f-localize', '本土/译制']];
     for (const [id, label] of REQUIRED_SELECTS) {
       const el = document.getElementById(id);
       if (!el.value) { el.classList.add('err'); toast(`请选择「${label}」`); return; }
@@ -1758,7 +1758,7 @@
       '搜索：按供应商名称输入筛选。',
       '新建 / 编辑弹窗：版权方名称（必填）；分成设置按收入范围设置分成比例——点「+ 添加收入范围」添加多行，每行填写收入范围（美元，同一收入范围不可重复且必须递增）+ 分成比例%（0~100），保存时校验。',
       { t: '第一阶段从0开始计算，超过最后一个阶段的按照最后一个阶段计算；', lv: 1 },
-      { t: '原合作模式设置字段删除；', lv: 1 },
+      { t: '原版权类型设置字段删除；', lv: 1 },
       '列表：ID / 供应商名称 / 分成设置（各收入范围及比例，多个用「 、 」分隔）/ 创建日期 / 操作（编辑、删除）。',
       '删除有「是否删除该供应商」二次确认。'
     ],
@@ -1806,9 +1806,9 @@
       '合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。',
       '合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。',
       '每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。',
-      '必填校验：名称（唯一）、性别标签、供应商、合作模式、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。',
+      '必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。',
       '剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。',
-      '分成设置：按分成时间范围分组（分组内不再设置合作模式，合作模式为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。',
+      '分成设置：按分成时间范围分组（分组内不再设置版权类型，版权类型为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。',
       '每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。',
       '同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。',
       '「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。'
