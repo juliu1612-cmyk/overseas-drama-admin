@@ -2793,7 +2793,8 @@
      交互说明：本机编辑（口令解锁，仅本机浏览器可编辑）
      - 未解锁：双击无编辑入口，只能看（会提示输口令）
      - 解锁后：双击「交互说明」→ 内容可增删改 → 「完成」保存
-     - 修改保存在本机浏览器；「复制全部」可导出文案给开发者更新线上
+     - 部署在服务器上时：保存自动同步云端，所有人 5 秒内看到最新文案
+     - 本地 / GitHub Pages 打开时：修改保存在本机浏览器；「复制全部」可导出文案给开发者更新线上
      ========================================================== */
   const HELP_EDIT_PASS = 'drama2026';   /* ← 编辑口令（想换口令改这里） */
   const HELP_OWNER_KEY = 'dramaHelpOwner_v1';
@@ -2930,7 +2931,7 @@
     try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
     exitHelpEditUI(h);
     fillHelpUl(h, items);
-    toast('交互说明已保存（本机生效，可「复制全部」同步线上）');
+    helpSyncPush();
   }
 
   function cancelHelpEdit() {
@@ -3158,6 +3159,60 @@
     if (ul && (e.target === ul || ul.contains(e.target))) normalizeHelpUl(ul);
   });
 
+  /* ===== 云端实时同步（部署在服务器上自动生效；GitHub Pages / 本地打开自动降级为纯本机模式） =====
+     - 保存：POST /api/help（带口令）→ 服务端写 help.json
+     - 查看：所有打开页面的人每 5 秒拉一次，有更新自动刷新（正在编辑时不打断）
+     - 服务端文案优先于代码默认文案；「恢复默认」回退到代码里的最新文案 */
+  var HELP_SYNC_URL = (location.protocol === 'http:' || location.protocol === 'https:') ? '/api/help' : null;
+  var helpRemoteStamp = null;
+
+  function helpSyncApply(data) {
+    if (!data || typeof data !== 'object') return;
+    helpOverrides = data;
+    try { localStorage.setItem(HELP_DATA_KEY, JSON.stringify(helpOverrides)); } catch (e) {}
+    if (helpEditing) return;              /* 编辑中不打断，退出编辑后下轮轮询生效 */
+    applyHelpOverrides();
+  }
+
+  function helpSyncPull() {
+    if (!HELP_SYNC_URL) return Promise.resolve();
+    return fetch(HELP_SYNC_URL, { cache: 'no-store' })
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(j => {
+        if (!j || !j.ok || !j.data || !Object.keys(j.data).length) return;
+        if (j.updatedAt !== helpRemoteStamp) {
+          const first = helpRemoteStamp === null;
+          helpRemoteStamp = j.updatedAt;
+          helpSyncApply(j.data);
+          if (!first && !helpEditing) toast('交互说明已更新为最新版');
+        }
+      })
+      .catch(() => { HELP_SYNC_URL = null; });   /* 接口不可用 → 静默降级为纯本机模式 */
+  }
+
+  function helpSyncPush() {
+    if (!HELP_SYNC_URL) { toast('交互说明已保存（本机生效，可「复制全部」同步线上）'); return; }
+    let data;
+    try { data = JSON.parse(helpExportJson()); } catch (e) { toast('交互说明已保存'); return; }
+    fetch(HELP_SYNC_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: HELP_EDIT_PASS, data: data })
+    })
+      .then(r => r.json().then(j => ({ ok: r.ok, j: j })).catch(() => ({ ok: r.ok, j: null })))
+      .then(res => {
+        if (res.ok && res.j && res.j.ok) { helpRemoteStamp = res.j.updatedAt; toast('已保存并同步到服务器，其他人几秒内可见'); }
+        else toast('本机已保存，云端同步失败：' + ((res.j && res.j.error) || '接口异常'));
+      })
+      .catch(() => toast('本机已保存，云端同步失败（网络异常）'));
+  }
+
+  function helpSyncInit() {
+    if (!HELP_SYNC_URL) return;
+    helpSyncPull();
+    setInterval(() => { if (HELP_SYNC_URL) helpSyncPull(); }, 5000);
+  }
+
   function initHelpEditing() {
     /* 先记录所有页面原始文案，再应用本机修改 */
     document.querySelectorAll('.tab-panel .panel-help').forEach(h => {
@@ -3168,6 +3223,7 @@
     markHelpOwnerUI();
     const pwd = document.getElementById('helpAuthPwd');
     if (pwd) pwd.addEventListener('keydown', e => { if (e.key === 'Enter') confirmHelpAuth(); });
+    helpSyncInit();
   }
   initHelpEditing();
 </script>
