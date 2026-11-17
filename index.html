@@ -442,7 +442,7 @@
       </div>
       <div class="help-pop">
         <div class="help-title">新增合集组 · 功能交互逻辑</div>
-        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成设置：按分成时间范围分组（分组内不再设置版权类型，版权类型为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
+        <ul><li>「+ 新增合集组」打开独立页面（顶部标签页），不再使用弹窗；列表操作列「编辑」同样跳转该页面并回填数据。</li><li>合集组ID：新增时只读展示「保存后自动生成」，编辑时展示现有ID。</li><li>合作范围（APP / YT / TT）：勾选标签后在其正下方展开对应授权信息填写区（上下相邻），取消勾选清空并隐藏。</li><li>每个范围的到期时间可勾选「永久」，勾选后日期输入框禁用、保存值为「永久」。</li><li>必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。</li><li>剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。</li><li>分成设置：按分成时间范围分组（分组内不再设置版权类型，版权类型为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。</li><li>每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），其余分成模式单独设置分成比例（0~100）与分成范围。</li><li>同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验。</li><li>「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。</li></ul>
         <div class="help-note">鼠标移出即可关闭</div>
       </div>
     </div></div>
@@ -1143,8 +1143,7 @@
   /* 无需设置分成比例的模式（只勾选分成范围） */
   const SHARE_NO_RATIO_MODES = ['不分成', '流水阶梯分成'];
   const SHARE_SCOPES_ALL = ['APP', '小程序', 'TT端原生', 'Kwai端原生', '社媒'];
-  const SHARE_SCOPES_NO_SOCIAL = ['APP', '小程序', 'TT端原生', 'Kwai端原生'];
-  function scopesOfMode(m) { return m === '消耗' ? SHARE_SCOPES_NO_SOCIAL : SHARE_SCOPES_ALL; }
+  function scopesOfMode(m) { return SHARE_SCOPES_ALL; }
   let shareSeq = 0;
   function refreshCoopTitles() {
     document.querySelectorAll('#shareCoops .sh-coop-title').forEach((t, k) => t.textContent = `分成时间范围分组 #${k + 1}`);
@@ -1771,13 +1770,15 @@
       { t: '上下架状态筛选，默认全部（未上架 / 上架）；', lv: 1 },
       { t: '审核状态筛选，默认全部；筛选查询的是所有剧集最新版本的审核状态（待提审 / 审核中 / 审核通过 / 已驳回 / 已撤回 / 申诉中）；', lv: 1 },
       { t: '资料状态：默认全部，支持多选（待完善 / 已完善）。待完善=封面、视频、字幕（英语的不考虑字幕状态）有任意一个未上传、上传失败或处理中；已完善=三项文件全部上传完成；', lv: 1 },
-      '列表（单个合集只可关联一个剧目ID）：剧目ID=合集ID关联媒资库的剧目ID；线上版本=剧目上线版本号，未上线展示「--」；',
+      '列表（单个合集只可关联一个剧目ID）：剧目ID=合集ID关联媒资库的剧目ID；线上版本=剧目上线版本号，未上线展示「--」；驳回原因=最新提审版本的失败原因（仅审核状态为「已驳回」时展示，其余展示「-」）；驳回剧集=该版本被驳回的具体剧集编号（如 EP03、EP07）；',
       '操作列：',
       { t: '详情：点击进入剧目视频列表页面（二级页）；', lv: 1 },
       { t: '授权小程序：维护剧目和小程序的授权关系；', lv: 1 },
       { t: '提审：送审合集若非英语，所有视频必须全部上传字幕后才可提审；合集中视频资源存在「处理中」「失败」状态的剧集时按钮置灰不可操作（资料待完善、审核中、申诉中同样置灰）；提审成功后版本记录里增加一条新的记录；', lv: 1 },
       '创建剧目：弹窗「选择合集」，支持合集ID / 合集组 / 合集名称 / 语言筛选，选中单个合集后确定创建，新剧目进入「待提审 + 待完善」状态。',
       '批量授权小程序：勾选列表行后可批量维护小程序授权关系；授权弹窗只展示「起点时光」主体的小程序。',
+      '批量提审：勾选列表行后可批量提审，逐条校验提审规则——资料待完善 / 审核中 / 申诉中、存在「处理中/失败」视频、非英语未全部上传字幕的剧目自动跳过；确认弹窗展示满足条件与跳过明细，提审成功后对应剧目审核状态变为「审核中」；',
+      '导出：按当前查询结果导出列表信息（CSV 文件，包含驳回原因 / 驳回剧集字段）。',
       '排序：列表按剧目创建时间倒序展示。'
     ],
     [TT_DET_KEY]: [
@@ -1854,8 +1855,8 @@
       '必填校验：名称（唯一）、性别标签、供应商、版权类型、本土/译制、已勾选范围的授权时间 / 到期时间 / 采买成本。',
       '剧本成本 / 出资金额 / IP成本单位为美元，保存后回列表展示并可导出。',
       '分成设置：按分成时间范围分组（分组内不再设置版权类型，版权类型为表单基础字段）；每个分组一组时间范围（精确到月；结束时间不能早于当前月份，可勾选「永久」：勾选后结束月输入框禁用、保存值为「永久」，永久段之后不可再有其他时间段），不同分组之间时间段不可重叠。',
-      '每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），消耗的分成范围不含社媒，其余分成模式单独设置分成比例（0~100）与分成范围。',
-      '同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验；采买-消耗的分成范围不含社媒。',
+      '每个分组下可添加多个分成模式（同一分组内分成模式不可重复：已被其他行选用的模式下拉置灰禁选，保存时二次校验），可选 利润/流水/流水阶梯分成/消耗/不分成；「不分成」与「流水阶梯分成」不设分成比例、只勾选分成范围（至少一个），其余分成模式单独设置分成比例（0~100）与分成范围。',
+      '同一分组内不同分成模式的分成范围不能重复勾选：已被其他分成模式勾选的范围在页面上即时置灰禁选，保存时二次校验。',
       '「确定」保存成功后自动返回列表并提示；「取消 / 返回列表」不保存直接返回。'
     ],
     '新首页': [
@@ -2868,7 +2869,7 @@
       const t = "2026-11-16 22:00:03";
       if (row.sh === "待提审") row._vers = [];
       else if (row.sh === "审核通过") row._vers = [{ no: 1, time: t, sh: "审核通过", fail: "-", state: row.online !== "--" ? "线上版本" : "-" }];
-      else if (row.sh === "已驳回") row._vers = [{ no: 1, time: t, sh: "已驳回", fail: "视频画质不清晰，请重新上传", state: "-" }];
+      else if (row.sh === "已驳回") { const fails = [["视频画质不清晰，请重新上传", "EP03、EP07"], ["字幕与视频内容不一致，请核对后重新上传", "EP02、EP05、EP08"], ["视频时长不足，单集时长需大于1分钟", "EP06"]]; const f = fails[(parseInt(row.id, 10) || 0) % fails.length]; row._vers = [{ no: 1, time: t, sh: "已驳回", fail: f[0], failEps: f[1], state: "-" }]; }
       else if (row.sh === "已撤回") row._vers = [{ no: 1, time: t, sh: "已撤回", fail: "-", state: "-" }];
       else row._vers = [{ no: 1, time: t, sh: row.sh, fail: "-", state: "-" }];
     }
@@ -2880,7 +2881,8 @@
     { k:"id", t:"合集ID", w:70 }, { k:"fakeId", t:"fakeId", w:60 }, { k:"gid", t:"合集组ID", w:80 },
     { k:"dramaId", t:"剧目ID", w:180 }, { k:"groupName", t:"合集组名称", w:220 }, { k:"name", t:"合集名称", w:250 },
     { k:"lang", t:"语言" }, { k:"online", t:"线上版本" }, { k:"zs", t:"资料状态", tag:true },
-    { k:"sj", t:"上架状态", tag:true }, { k:"sh", t:"审核状态", tag:true }
+    { k:"sj", t:"上架状态", tag:true }, { k:"sh", t:"审核状态", tag:true },
+    { k:"fail", t:"驳回原因", w:180 }, { k:"failEps", t:"驳回剧集", w:110 }
   ];
   function buildTtPanel() {
     const searchCfg = [
@@ -2889,42 +2891,53 @@
     ];
     return helpHtml(TT_TAB)
       + buildSearchCard(searchCfg, `<button class="btn btn-primary" onclick="renderTtTable();toast('查询完成')">搜 索</button><button class="btn" onclick="resetTt()">重 置</button>`)
-      + `<div class="card mt12"><div class="table-toolbar"><button class="btn btn-primary" onclick="openTtCreate()">创建剧目</button><button class="btn btn-green" style="margin-left:8px" id="btnTtBatchAuth" disabled onclick="openTtAuth(null)">批量授权小程序</button></div>`
-      + `<div class="table-wrap"><table style="min-width:1500px"><thead><tr><th style="width:36px"><input type="checkbox" onclick="ttCheckAll(this)"></th>${TT_COLS.map(c => `<th${c.w ? ' style="width:' + c.w + 'px"' : ''}>${c.t}</th>`).join("")}<th class="col-ops" style="width:180px">操作</th></tr></thead><tbody id="ttTbody"></tbody></table></div>`
+      + `<div class="card mt12"><div class="table-toolbar"><button class="btn btn-primary" onclick="openTtCreate()">创建剧目</button><button class="btn btn-green" style="margin-left:8px" id="btnTtBatchSubmit" disabled onclick="ttBatchSubmit()">批量提审</button><button class="btn btn-green" style="margin-left:8px" id="btnTtBatchAuth" disabled onclick="openTtAuth(null)">批量授权小程序</button><button class="btn" style="float:right" onclick="ttExport()">导 出</button></div>`
+      + `<div class="table-wrap"><table style="min-width:1800px"><thead><tr><th style="width:36px"><input type="checkbox" onclick="ttCheckAll(this)"></th>${TT_COLS.map(c => `<th${c.w ? ' style="width:' + c.w + 'px"' : ''}>${c.t}</th>`).join("")}<th class="col-ops" style="width:180px">操作</th></tr></thead><tbody id="ttTbody"></tbody></table></div>`
       + `<div class="pager">共 <span id="ttTotal">0</span> 条　<select class="input" style="width:104px;display:inline-block;height:28px;padding:0 6px;font-size:12px;margin-left:8px;" onchange="toast('演示：每页 ' + this.value)"><option>10条/页</option><option>20条/页</option><option>50条/页</option><option>100条/页</option></select></div></div>`;
   }
   function ttSubDisabled(r) { return r.zs === "待完善" || r.sh === "审核中" || r.sh === "申诉中"; }
+  function ttLastReject(row) {
+    const vers = ttVersOf(row);
+    for (let i = vers.length - 1; i >= 0; i--) if (vers[i].sh === "已驳回" && vers[i].fail && vers[i].fail !== "-") return vers[i];
+    return null;
+  }
   function ttRowHtml(r) {
-    const dis = ttSubDisabled(r);
-    return "<tr><td><input type='checkbox' class='row-check' onchange='ttSyncBatch()'></td>" + TT_COLS.map(c => {
+    const dis = ttSubDisabled(r), rej = ttLastReject(r);
+    return "<tr><td><input type='checkbox' class='row-check' data-id='" + r.dramaId + "' onchange='ttSyncBatch()'></td>" + TT_COLS.map(c => {
       if (c.k === "fakeId" || c.k === "gid") return `<td>${txtCell(r[c.k], 70)}</td>`;
       if (c.k === "dramaId") return `<td><span class="ellipsis" style="max-width:170px;display:inline-block">${r.dramaId}</span></td>`;
+      if (c.k === "fail") return `<td>${txtCell(rej ? rej.fail : "-", c.w)}</td>`;
+      if (c.k === "failEps") return `<td>${rej && rej.failEps ? rej.failEps : "-"}</td>`;
       if (c.tag) return `<td>${ttTag(r[c.k])}</td>`;
       if (c.k === "online") return `<td>${r.online}</td>`;
       return `<td>${txtCell(r[c.k], c.w)}</td>`;
     }).join("") + `<td class="col-ops"><span class="link" onclick="openTtDetail('${r.dramaId}')">详情</span><span class="link" onclick="openTtAuth('${r.dramaId}')">授权小程序</span><span class="link${dis ? " disabled" : ""}" ${dis ? `onclick="toast('演示：${r.zs === "待完善" ? "资料待完善" : r.sh}状态下不可提审')"` : `onclick="ttSubmit('${r.dramaId}')"`}>提审</span></td></tr>`;
   }
-  function renderTtTable() {
+  function ttFilteredList() {
     const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
-    const fakeid = g("tt-fakeid").toLowerCase(), cid = g("tt-cid"), dramaid = g("tt-dramaid"), group = g("tt-group");
-    const lang = g("tt-lang"), sj = g("tt-sj"), sh = g("tt-sh"), zs = g("tt-zs");
+    const q = { fakeid: g("tt-fakeid").toLowerCase(), cid: g("tt-cid"), dramaid: g("tt-dramaid"), group: g("tt-group"), lang: g("tt-lang"), sj: g("tt-sj"), sh: g("tt-sh"), zs: g("tt-zs") };
     const list = ttRows.filter(r =>
-      (!fakeid || (r.fakeId || "").toLowerCase().includes(fakeid))
-      && (!cid || r.id.includes(cid))
-      && (!dramaid || r.dramaId.includes(dramaid))
-      && (!group || r.groupName.toLowerCase().includes(group.toLowerCase()) || r.name.toLowerCase().includes(group.toLowerCase()))
-      && (!lang || r.lang === lang) && (!sj || r.sj === sj) && (!sh || r.sh === sh) && (!zs || r.zs === zs));
+      (!q.fakeid || (r.fakeId || "").toLowerCase().includes(q.fakeid))
+      && (!q.cid || r.id.includes(q.cid))
+      && (!q.dramaid || r.dramaId.includes(q.dramaid))
+      && (!q.group || r.groupName.toLowerCase().includes(q.group.toLowerCase()) || r.name.toLowerCase().includes(q.group.toLowerCase()))
+      && (!q.lang || r.lang === q.lang) && (!q.sj || r.sj === q.sj) && (!q.sh || r.sh === q.sh) && (!q.zs || r.zs === q.zs));
+    return { list, filtered: !!(q.fakeid || q.cid || q.dramaid || q.group || q.lang || q.sj || q.sh || q.zs) };
+  }
+  function renderTtTable() {
+    const res = ttFilteredList(), list = res.list;
     const tb = document.getElementById("ttTbody");
-    if (tb) tb.innerHTML = list.length ? list.map(ttRowHtml).join("") : '<tr><td colspan="13" class="empty">暂无数据</td></tr>';
+    if (tb) tb.innerHTML = list.length ? list.map(ttRowHtml).join("") : '<tr><td colspan="15" class="empty">暂无数据</td></tr>';
     const total = document.getElementById("ttTotal");
-    if (total) total.textContent = (fakeid || cid || dramaid || group || lang || sj || sh || zs) ? `筛选出 ${list.length} 条（示例数据）` : "4160";
+    if (total) total.textContent = res.filtered ? `筛选出 ${list.length} 条（示例数据）` : "4160";
     ttSyncBatch();
   }
   function resetTt() { ["tt-fakeid","tt-cid","tt-dramaid","tt-group","tt-lang","tt-sj","tt-sh","tt-zs"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; }); renderTtTable(); }
   function ttCheckAll(el) { document.querySelectorAll("#ttTbody input.row-check").forEach(c => c.checked = el.checked); ttSyncBatch(); }
   function ttSyncBatch() {
     const n = document.querySelectorAll("#ttTbody input.row-check:checked").length;
-    const b = document.getElementById("btnTtBatchAuth"); if (b) b.disabled = !n;
+    const a = document.getElementById("btnTtBatchAuth"); if (a) a.disabled = !n;
+    const s = document.getElementById("btnTtBatchSubmit"); if (s) s.disabled = !n;
   }
   function ttSubmit(dramaId) {
     const r = ttRows.find(x => x.dramaId === dramaId);
@@ -2938,6 +2951,45 @@
       renderTtTable();
       toast("演示：提审成功，审核状态已变为「审核中」");
     });
+  }
+  function ttBatchSubmit() {
+    const ids = [...document.querySelectorAll("#ttTbody input.row-check:checked")].map(c => c.dataset.id).filter(Boolean);
+    if (!ids.length) { toast("请先勾选要提审的剧目"); return; }
+    const ok = [], skip = [];
+    ids.forEach(id => {
+      const r = ttRows.find(x => x.dramaId === id);
+      if (!r) return;
+      if (ttSubDisabled(r)) { skip.push(r.groupName + "（" + (r.zs === "待完善" ? "资料待完善" : r.sh) + "）"); return; }
+      const eps = ttEpsOf(r);
+      if (eps.some(e => e.vStatus === "处理中" || e.vStatus === "失败")) { skip.push(r.groupName + "（存在处理中/失败视频）"); return; }
+      if (r.lang !== "英语" && eps.some(e => e.subStatus !== "成功")) { skip.push(r.groupName + "（非英语未全部上传字幕）"); return; }
+      ok.push(r);
+    });
+    if (!ok.length) { toast("演示：勾选的 " + ids.length + " 条剧目均不满足提审条件，已全部跳过"); return; }
+    msgbox("批量提审确认", "共勾选 <b>" + ids.length + "</b> 条，满足提审条件 <b>" + ok.length + "</b> 条" + (skip.length ? "，跳过 " + skip.length + " 条：<br><span style='color:#909399'>" + skip.map(s => "· " + s).join("<br>") + "</span>" : "") + "。确认批量提审?", () => {
+      ok.forEach(r => r.sh = "审核中");
+      renderTtTable();
+      toast("演示：批量提审完成，成功 " + ok.length + " 条、跳过 " + skip.length + " 条");
+    });
+  }
+  function ttExport() {
+    const res = ttFilteredList(), list = res.list;
+    if (!list.length) { toast("当前没有可导出的数据"); return; }
+    const head = ["合集ID", "fakeId", "合集组ID", "剧目ID", "合集组名称", "合集名称", "语言", "线上版本", "资料状态", "上架状态", "审核状态", "驳回原因", "驳回剧集"];
+    const rows = list.map(r => {
+      const rej = ttLastReject(r);
+      return [r.id, r.fakeId, r.gid, r.dramaId, r.groupName, r.name, r.lang, r.online, r.zs, r.sj, r.sh, rej ? rej.fail : "-", rej && rej.failEps ? rej.failEps : "-"];
+    });
+    const csv = [head].concat(rows).map(cols => cols.map(v => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"').join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "TT媒资列表.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    toast("演示：已按当前查询结果导出 " + list.length + " 条列表信息");
   }
 
   /* 创建剧目（选择合集） */
