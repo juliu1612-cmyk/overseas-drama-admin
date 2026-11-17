@@ -42,6 +42,7 @@
   .val-line .d { color: #303133; }
   .dash { color: #c0c4cc; }
   .link { color: #409eff; cursor: pointer; }
+  .link.disabled { color: #c0c4cc; cursor: not-allowed; }
   .link.danger { color: #f56c6c; }
   .link + .link { margin-left: 10px; }
   .pager { padding: 12px 20px 18px; text-align: right; color: #909399; font-size: 13px; }
@@ -257,6 +258,8 @@
   .eps-tabs { display: flex; gap: 2px; }
   .eps-tab { padding: 8px 22px; background: #fff; border: 1px solid #dcdfe6; border-radius: 4px 4px 0 0; cursor: pointer; font-size: 14px; color: #606266; }
   .eps-tab.active { background: #409eff; border-color: #409eff; color: #fff; }
+  .tt-app-item { padding: 7px 12px; font-size: 13px; color: #606266; cursor: pointer; border-bottom: 1px solid #f0f2f5; }
+  .tt-app-item:hover { background: #ecf5ff; }
   .video-box { width: 360px; height: 480px; background: #1d2939; border-radius: 8px; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
   .video-box .vplay { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,.18); display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .video-box .vplay::after { content: ''; border-style: solid; border-width: 11px 0 11px 18px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
@@ -1728,16 +1731,18 @@
   };
   const MENU = [
     { label: '供应商管理', icon: 'coins', children: ['合集组管理', '供应商管理', '供应商结算数据'] },
-    { label: '内容管理', icon: 'movie', children: ['内容列表', '短剧管理'] }
+    { label: '内容管理', icon: 'movie', children: ['内容列表', '短剧管理', 'TT媒资审核'] }
   ];
   let activeMenu = '合集组管理';
 
   const LIST_TAB = '供应商管理 / 合集组管理';
   const MC_TAB = '内容管理 / 内容列表';
   const SM_TAB = '内容管理 / 短剧管理';
+  const TT_TAB = '内容管理 / TT媒资审核';
+  const TT_DET_KEY = TT_TAB + ' / 剧集详情';
   const SUP_TAB = '供应商管理 / 供应商管理';
   const SUPS_TAB = '供应商管理 / 供应商结算数据';
-  const TABS = ['新首页', 'TT审核统计', '前集统计', '投放数据数据', '素材管理', '上传素材', MC_TAB, SM_TAB, LIST_TAB, FORM_TAB];
+  const TABS = ['新首页', 'TT审核统计', '前集统计', '投放数据数据', '素材管理', '上传素材', MC_TAB, SM_TAB, TT_TAB, LIST_TAB, FORM_TAB];
   let activeTab = LIST_TAB;
 
   /* 各页面的功能交互逻辑说明（右上角入口 hover 展示） */
@@ -1759,6 +1764,40 @@
       '剧集收费：按系统 / 国家配置定价规则，默认规则从起始收费集生效，未设置价格的剧集与前一集保持一致，点确定立即生效。',
       '查看剧集页（短剧管理版）：与内容列表版不同，仅左侧竖屏视频播放器 + 右侧分集页码方块（页码下标注 free / 单集价格），点击页码切换播放剧集，无表格与操作按钮。',
       '操作列：短剧详情、查看剧集（独立标签页）、剧集收费。'
+    ],
+    [TT_TAB]: [
+      '筛选：支持 fakeId / 合集ID / 剧目ID / 合集组 搜索查询；',
+      { t: '支持语言筛选；', lv: 1 },
+      { t: '上下架状态筛选，默认全部（未上架 / 上架）；', lv: 1 },
+      { t: '审核状态筛选，默认全部；筛选查询的是所有剧集最新版本的审核状态（待提审 / 审核中 / 审核通过 / 已驳回 / 已撤回 / 申诉中）；', lv: 1 },
+      { t: '资料状态：默认全部，支持多选（待完善 / 已完善）。待完善=封面、视频、字幕（英语的不考虑字幕状态）有任意一个未上传、上传失败或处理中；已完善=三项文件全部上传完成；', lv: 1 },
+      '列表（单个合集只可关联一个剧目ID）：剧目ID=合集ID关联媒资库的剧目ID；线上版本=剧目上线版本号，未上线展示「--」；',
+      '操作列：',
+      { t: '详情：点击进入剧目视频列表页面（二级页）；', lv: 1 },
+      { t: '授权小程序：维护剧目和小程序的授权关系；', lv: 1 },
+      { t: '提审：送审合集若非英语，所有视频必须全部上传字幕后才可提审；合集中视频资源存在「处理中」「失败」状态的剧集时按钮置灰不可操作（资料待完善、审核中、申诉中同样置灰）；提审成功后版本记录里增加一条新的记录；', lv: 1 },
+      '创建剧目：弹窗「选择合集」，支持合集ID / 合集组 / 合集名称 / 语言筛选，选中单个合集后确定创建，新剧目进入「待提审 + 待完善」状态。',
+      '批量授权小程序：勾选列表行后可批量维护小程序授权关系；授权弹窗只展示「起点时光」主体的小程序。',
+      '排序：列表按剧目创建时间倒序展示。'
+    ],
+    [TT_DET_KEY]: [
+      '页签：「剧集信息 / 版本记录」；顶部合集信息展示关联的合集组名称及语言；返回列表见面包屑。',
+      '剧集列表（展示该合集下最新版本关联的剧集视频信息）：',
+      { t: '视频ID：媒资库的视频 vid，视频上传成功后补充；ID：自有视频ID；剧集：视频在列表的排序，从上到下从1开始；剧名：剧集名称；封面：取视频第一帧；字幕：字幕文件名称（点击可下载）；', lv: 1 },
+      { t: '视频上传状态：处理中 / 成功 / 失败；字幕上传状态：处理中 / 成功 / 失败 / 待上传；', lv: 1 },
+      '操作列：',
+      { t: '替换视频：上传新的视频并与当前剧集绑定；替换视频 / 排序操作时，若最新版本为「未提审」「已撤回」状态则在最新版本中编辑，非这两个状态则新增一个版本进行编辑；', lv: 1 },
+      { t: '上传字幕：上传字幕文件并绑定视频ID；只有视频上传成功的才可添加字幕；', lv: 1 },
+      { t: '播放：视频在左侧播放；', lv: 1 },
+      '顶部批量操作：',
+      { t: '上传字幕：批量替换，按剧集顺序依次替换；本地上传仅限 srt 文件、支持多选；按字幕文件名称中的数字与未上传字幕的剧集匹配上传，匹配不上或剧集已有字幕则跳过；只有视频状态为「成功」的才可上传字幕；', lv: 1 },
+      { t: '同步字幕：自动同步该合集组下最新提审合集的字幕文件；', lv: 1 },
+      { t: '变更剧目封面：重新上传并替换当前剧目封面。', lv: 1 },
+      '版本记录页签（列表按版本号倒序）：',
+      { t: '版本号=审核版本号；提审时间=该版本最近一次提交审核的时间（精确到秒）；失败原因展示驳回原因；', lv: 1 },
+      { t: '审核状态与三方对应：审核中=1；已驳回=3、7；申诉中=5；已撤回=4；审核通过=2、6；', lv: 1 },
+      { t: '版本状态：一个剧目ID下最多有一个线上版本，且为审核通过的版本；新审核通过的版本自动改为线上版本；', lv: 1 },
+      { t: '操作：审核中→「撤回」（弹窗二次确认）；已驳回→「申诉」（申诉理由最多500字，申诉文件最多10条、单条200M以内）；申诉中→「申诉」置灰不可点；已撤回→「送审」；审核通过→「上线版本」（已是线上状态不可点，上线新版本会同时下线之前的上线版本）；「详情」查看不同版本剧集对应的视频信息；', lv: 1 }
     ],
     [SUP_TAB]: [
       '搜索：按供应商名称输入筛选。',
@@ -1838,11 +1877,6 @@
       '演示占位：原型仅实现了「合集组管理」的完整交互。',
       '应汇总各渠道投放花费、曝光、点击、转化与 ROI，支持按账户 / 计划 / 素材逐层下钻。',
       '交互预期：指标列可排序，支持自定义时间区间与导出报表。'
-    ],
-    '短剧管理': [
-      '演示占位：原型仅实现了「合集组管理」的完整交互。',
-      '应维护短剧基础信息、剧集清单与上下架状态，并与合集组建立关联。',
-      '交互预期：上下架需二次确认，剧集清单支持批量导入与排序调整。'
     ],
     '素材管理': [
       '演示占位：原型仅实现了「合集组管理」的完整交互。',
@@ -1951,7 +1985,7 @@
   function buildSearchCard(cfg, btns) {
     return `<div class="card search-card"><div class="search-grid">${cfg.map(row => row.map(f => {
       let ctl;
-      if (f.type === "select") ctl = `<select class="input"><option value="">请选择</option>${(f.options || []).map(o => "<option>" + o + "</option>").join("")}</select>`;
+      if (f.type === "select") ctl = `<select class="input"${f.id ? ' id="' + f.id + '"' : ""}><option value="">请选择</option>${(f.options || []).map(o => "<option>" + o + "</option>").join("")}</select>`;
       else if (f.type === "daterange") ctl = `<input class="input" type="date" style="flex:1"><span style="color:#909399">至</span><input class="input" type="date" style="flex:1">`;
       else ctl = `<input class="input" placeholder="${f.ph || "请输入"}"${f.id ? ' id="' + f.id + '"' : ""}>`;
       return `<div class="sitem"><label>${f.label}</label>${ctl}</div>`;
@@ -2700,7 +2734,7 @@
       const c = sub.dataset.c;
       document.querySelectorAll('.submenu-item').forEach(x => x.classList.remove('active'));
       sub.classList.add('active');
-      const map = { '合集组管理': LIST_TAB, '供应商管理': SUP_TAB, '供应商结算数据': SUPS_TAB, '内容列表': MC_TAB, '短剧管理': SM_TAB };
+      const map = { '合集组管理': LIST_TAB, '供应商管理': SUP_TAB, '供应商结算数据': SUPS_TAB, '内容列表': MC_TAB, '短剧管理': SM_TAB, 'TT媒资审核': TT_TAB };
       if (map[c]) switchTab(map[c]);
       else toast('演示原型：「' + c + '」未接入内容');
       return;
@@ -2772,6 +2806,496 @@
   setInterval(tick, 1000);
   tick();
 
+  /* ========== TT媒资审核（复刻自容量海外短剧后台 内容管理/TT媒资审核） ========== */
+  const TT_LANGS = ["简体中文","繁体中文","英语","印尼语","西班牙语","泰语","日语","韩语","德语","法语","葡萄牙语","阿拉伯语","土耳其语","俄语","意大利语","越南语","波兰语","马来语"];
+  const TT_SH_STATUS = ["待提审","审核中","审核通过","已驳回","已撤回","申诉中"];
+  const TT_TAG_COLORS = { "已完善":"#67c23a","待完善":"#e6a23c","上架":"#67c23a","未上架":"#909399","审核通过":"#67c23a","审核中":"#409eff","待提审":"#909399","已驳回":"#f56c6c","已撤回":"#e6a23c","申诉中":"#e6a23c","成功":"#67c23a","处理中":"#409eff","失败":"#f56c6c","待上传":"#e6a23c","线上版本":"#67c23a" };
+  function ttTag(v) { const c = TT_TAG_COLORS[v]; return c ? `<span class="mini-tag" style="background:${c}">${v}</span>` : (v || '<span class="dash">-</span>'); }
+
+  let ttRows = [
+    { id:"13485", fakeId:"781j", gid:"11092", dramaId:"7708700074326624308", groupName:"Boyfriend\u2019s Desensitization Test", name:"Boyfriend\u2019s Desensitization Test", lang:"英语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:["FlixDrama"] },
+    { id:"13265", fakeId:"WNdG", gid:"11032", dramaId:"7708688096154208262", groupName:"Reborn at Six\uff0cI Made Mom Rich", name:"Reborn at Six\uff0cI Made Mom Rich", lang:"英语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:[] },
+    { id:"13445", fakeId:"nMzA", gid:"11050", dramaId:"7708674473034074113", groupName:"我的乞丐老公竟是赫尔墨斯", name:"My Beggar Husband Is Secretly Hermes", lang:"英语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:[] },
+    { id:"13489", fakeId:"nM8A", gid:"11050", dramaId:"7708674983481083905", groupName:"我的乞丐老公竟是赫尔墨斯", name:"(Doblado)Mi esposo mendigo es Hermes en secreto", lang:"西班牙语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:[] },
+    { id:"13455", fakeId:"ej3m", gid:"11064", dramaId:"7708668095690278913", groupName:"婆媳联手之拨乱反正", name:"(\u0e1e\u0e32\u0e01\u0e22\u0e4c)\u0e41\u0e21\u0e48\u0e1c\u0e31\u0e27\u0e25\u0e39\u0e01\u0e2a\u0e30\u0e43\u0e20\u0e49\u0e41\u0e17\u0e47\u0e01\u0e17\u0e35\u0e21", lang:"泰语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:[] },
+    { id:"13461", fakeId:"KmVV", gid:"11064", dramaId:"7708668095690262529", groupName:"婆媳联手之拨乱反正", name:"(Dubbing)Aksi Mertua dan Menantu", lang:"印尼语", online:"1", zs:"已完善", sj:"上架", sh:"审核通过", apps:[] },
+    { id:"13481", fakeId:"zKYa", gid:"11045", dramaId:"7708630311882934324", groupName:"黑手党总裁的专属奶妈", name:"(Dubbing)Nanny eksklusif bos mafia", lang:"印尼语", online:"--", zs:"已完善", sj:"未上架", sh:"审核通过", apps:[] },
+    { id:"13744", fakeId:"", gid:"", dramaId:"7708801122334455667", groupName:"逆渊重生", name:"逆淵重生", lang:"繁体中文", online:"--", zs:"待完善", sj:"未上架", sh:"待提审", apps:[] },
+    { id:"13735", fakeId:"", gid:"", dramaId:"7708801122334455999", groupName:"逆渊重生", name:"Reborn from the Vengeful Abyss", lang:"英语", online:"--", zs:"已完善", sj:"未上架", sh:"待提审", apps:[] },
+    { id:"13477", fakeId:"oklP", gid:"11075", dramaId:"7708597442190870534", groupName:"My Daughter\u2019s Dad Is My Billionaire Boss", name:"My Daughter\u2019s Dad Is My Billionaire Boss", lang:"英语", online:"--", zs:"已完善", sj:"未上架", sh:"审核中", apps:[] },
+    { id:"13264", fakeId:"", gid:"", dramaId:"7707824955985135622", groupName:"Two\u2011Hundred\u2011Pound Bride\u2019s Secret Heirs", name:"Two\u2011Hundred\u2011Pound Bride\u2019s Secret Heirs", lang:"英语", online:"--", zs:"已完善", sj:"未上架", sh:"已驳回", apps:[] },
+    { id:"13217", fakeId:"", gid:"10953", dramaId:"7708580763550566406", groupName:"คุณหนูถูกหลอกขัง", name:"คุณหนูถูกหลอกขัง", lang:"泰语", online:"--", zs:"已完善", sj:"未上架", sh:"已撤回", apps:[] },
+    { id:"13466", fakeId:"50rP", gid:"11060", dramaId:"7708590578745673780", groupName:"规章有温度", name:"(Dubbing)Aturan Penuh Cinta", lang:"印尼语", online:"--", zs:"已完善", sj:"未上架", sh:"申诉中", apps:[] }
+  ];
+
+  /* 选择合集弹窗数据（创建剧目） */
+  const TT_POOL = [
+    { id:"13744", groupName:"逆渊重生", name:"逆淵重生", lang:"繁体中文", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13743", groupName:"逆渊重生", name:"심연의 부활", lang:"韩语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13742", groupName:"逆渊重生", name:"Wiedergeburt aus dem Abgrund", lang:"德语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13741", groupName:"逆渊重生", name:"Renaissance des abysses", lang:"法语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13740", groupName:"逆渊重生", name:"Renacimiento desde el abismo", lang:"西班牙语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13739", groupName:"逆渊重生", name:"Sinh L\u1ea1i T\u1eeb V\u1ee5c Th\u1eb3m B\u00e1o Th\u00f9", lang:"越南语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13738", groupName:"逆渊重生", name:"คืนชีพจากเหวอฆาตแค้น", lang:"泰语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13737", groupName:"逆渊重生", name:"Kebangkitan dari jurang dendam", lang:"印尼语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13736", groupName:"逆渊重生", name:"深淵転生 復讐譚", lang:"日语", category:"字幕剧", epType:"AI仿真人" },
+    { id:"13735", groupName:"逆渊重生", name:"Reborn from the Vengeful Abyss", lang:"英语", category:"字幕剧", epType:"AI仿真人" }
+  ];
+
+  /* 小程序清单（授权弹窗，仅「起点时光」主体） */
+  const TT_APPS = ["StarShort","TT小程序沙箱","MiniDrama沙箱","MiniDrama","FreeShort","FreeShort沙箱","GratisDrama","GratisDrama沙箱","AniMini","MaxDrama","Peekshort","FeverShort","YouReel","TubeReel","ytubedrama","InstaDrama","SnapReel","MoReel","NetReel","HuluPlay","ViuDrama","MaxShow","TokDrama","YumeBL Clip","TwizShow","BigoDrama","DiscPlay","XDrama","HuloFun","InsClip","AppleDrama","CrunDrama","Googreel","KuwaDrama","EchoFlicks","MuseShorts","SagaShorts","SunShorts","DramaOath","AetherDrama","EpicPlay","PlayLoop","SparkShorts"];
+  const TT_APP_SUBMIT = ["TT小程序沙箱","MiniDrama沙箱","FreeShort沙箱","GratisDrama沙箱","FlixDrama"]; /* 已提审标记 */
+
+  /* 详情页数据 */
+  let ttCurDrama = null, ttDetTab = "info", ttCurEp = null;
+  function ttEpsOf(row) {
+    if (!row._eps) {
+      const n = 8 + (parseInt(row.id, 10) || 13485) % 5;
+      row._eps = [];
+      for (let i = 1; i <= n; i++) {
+        let vStatus = "成功", subStatus = "待上传", sub = "-", vid = "v25e6agm0018dbte4dqtgd65lra9" + (9120 + i);
+        if (i === n && row.zs === "待完善") { vStatus = "处理中"; vid = "-"; }
+        else if (i === n - 1 && row.zs === "待完善") { vStatus = "失败"; vid = "-"; }
+        if (row.lang === "英语" || row._subAll) { sub = "EP" + String(i).padStart(2, "0") + ".srt"; subStatus = "成功"; }
+        if (!row._subAll && i === 3 && row.zs !== "待完善") { subStatus = "失败"; }
+        row._eps.push({ no: i, vid, id: String(554600 + i), ttid: String(7708700214572828670n + BigInt(i)), name: "EP" + String(i).padStart(2, "0"), sub, vStatus, subStatus });
+      }
+    }
+    return row._eps;
+  }
+  function ttVersOf(row) {
+    if (!row._vers) {
+      const t = "2026-11-16 22:00:03";
+      if (row.sh === "待提审") row._vers = [];
+      else if (row.sh === "审核通过") row._vers = [{ no: 1, time: t, sh: "审核通过", fail: "-", state: row.online !== "--" ? "线上版本" : "-" }];
+      else if (row.sh === "已驳回") row._vers = [{ no: 1, time: t, sh: "已驳回", fail: "视频画质不清晰，请重新上传", state: "-" }];
+      else if (row.sh === "已撤回") row._vers = [{ no: 1, time: t, sh: "已撤回", fail: "-", state: "-" }];
+      else row._vers = [{ no: 1, time: t, sh: row.sh, fail: "-", state: "-" }];
+    }
+    return row._vers;
+  }
+
+  /* 列表页 */
+  const TT_COLS = [
+    { k:"id", t:"合集ID", w:70 }, { k:"fakeId", t:"fakeId", w:60 }, { k:"gid", t:"合集组ID", w:80 },
+    { k:"dramaId", t:"剧目ID", w:180 }, { k:"groupName", t:"合集组名称", w:220 }, { k:"name", t:"合集名称", w:250 },
+    { k:"lang", t:"语言" }, { k:"online", t:"线上版本" }, { k:"zs", t:"资料状态", tag:true },
+    { k:"sj", t:"上架状态", tag:true }, { k:"sh", t:"审核状态", tag:true }
+  ];
+  function buildTtPanel() {
+    const searchCfg = [
+      [ { label:"fakeId", type:"input", ph:"请输入fakeId", id:"tt-fakeid" }, { label:"合集ID", type:"input", ph:"请输入合集ID", id:"tt-cid" }, { label:"剧目ID", type:"input", ph:"请输入剧目ID", id:"tt-dramaid" }, { label:"合集组", type:"input", ph:"请输入合集组", id:"tt-group" } ],
+      [ { label:"语言", type:"select", options:TT_LANGS, id:"tt-lang" }, { label:"上下架状态", type:"select", options:["未上架","上架"], id:"tt-sj" }, { label:"审核状态", type:"select", options:TT_SH_STATUS, id:"tt-sh" }, { label:"资料状态", type:"select", options:["待完善","已完善"], id:"tt-zs" } ]
+    ];
+    return helpHtml(TT_TAB)
+      + buildSearchCard(searchCfg, `<button class="btn btn-primary" onclick="renderTtTable();toast('查询完成')">搜 索</button><button class="btn" onclick="resetTt()">重 置</button>`)
+      + `<div class="card mt12"><div class="table-toolbar"><button class="btn btn-primary" onclick="openTtCreate()">创建剧目</button><button class="btn btn-green" style="margin-left:8px" id="btnTtBatchAuth" disabled onclick="openTtAuth(null)">批量授权小程序</button></div>`
+      + `<div class="table-wrap"><table style="min-width:1500px"><thead><tr><th style="width:36px"><input type="checkbox" onclick="ttCheckAll(this)"></th>${TT_COLS.map(c => `<th${c.w ? ' style="width:' + c.w + 'px"' : ''}>${c.t}</th>`).join("")}<th class="col-ops" style="width:180px">操作</th></tr></thead><tbody id="ttTbody"></tbody></table></div>`
+      + `<div class="pager">共 <span id="ttTotal">0</span> 条　<select class="input" style="width:104px;display:inline-block;height:28px;padding:0 6px;font-size:12px;margin-left:8px;" onchange="toast('演示：每页 ' + this.value)"><option>10条/页</option><option>20条/页</option><option>50条/页</option><option>100条/页</option></select></div></div>`;
+  }
+  function ttSubDisabled(r) { return r.zs === "待完善" || r.sh === "审核中" || r.sh === "申诉中"; }
+  function ttRowHtml(r) {
+    const dis = ttSubDisabled(r);
+    return "<tr><td><input type='checkbox' class='row-check' onchange='ttSyncBatch()'></td>" + TT_COLS.map(c => {
+      if (c.k === "fakeId" || c.k === "gid") return `<td>${txtCell(r[c.k], 70)}</td>`;
+      if (c.k === "dramaId") return `<td><span class="ellipsis" style="max-width:170px;display:inline-block">${r.dramaId}</span></td>`;
+      if (c.tag) return `<td>${ttTag(r[c.k])}</td>`;
+      if (c.k === "online") return `<td>${r.online}</td>`;
+      return `<td>${txtCell(r[c.k], c.w)}</td>`;
+    }).join("") + `<td class="col-ops"><span class="link" onclick="openTtDetail('${r.dramaId}')">详情</span><span class="link" onclick="openTtAuth('${r.dramaId}')">授权小程序</span><span class="link${dis ? " disabled" : ""}" ${dis ? `onclick="toast('演示：${r.zs === "待完善" ? "资料待完善" : r.sh}状态下不可提审')"` : `onclick="ttSubmit('${r.dramaId}')"`}>提审</span></td></tr>`;
+  }
+  function renderTtTable() {
+    const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+    const fakeid = g("tt-fakeid").toLowerCase(), cid = g("tt-cid"), dramaid = g("tt-dramaid"), group = g("tt-group");
+    const lang = g("tt-lang"), sj = g("tt-sj"), sh = g("tt-sh"), zs = g("tt-zs");
+    const list = ttRows.filter(r =>
+      (!fakeid || (r.fakeId || "").toLowerCase().includes(fakeid))
+      && (!cid || r.id.includes(cid))
+      && (!dramaid || r.dramaId.includes(dramaid))
+      && (!group || r.groupName.toLowerCase().includes(group.toLowerCase()) || r.name.toLowerCase().includes(group.toLowerCase()))
+      && (!lang || r.lang === lang) && (!sj || r.sj === sj) && (!sh || r.sh === sh) && (!zs || r.zs === zs));
+    const tb = document.getElementById("ttTbody");
+    if (tb) tb.innerHTML = list.length ? list.map(ttRowHtml).join("") : '<tr><td colspan="13" class="empty">暂无数据</td></tr>';
+    const total = document.getElementById("ttTotal");
+    if (total) total.textContent = (fakeid || cid || dramaid || group || lang || sj || sh || zs) ? `筛选出 ${list.length} 条（示例数据）` : "4160";
+    ttSyncBatch();
+  }
+  function resetTt() { ["tt-fakeid","tt-cid","tt-dramaid","tt-group","tt-lang","tt-sj","tt-sh","tt-zs"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; }); renderTtTable(); }
+  function ttCheckAll(el) { document.querySelectorAll("#ttTbody input.row-check").forEach(c => c.checked = el.checked); ttSyncBatch(); }
+  function ttSyncBatch() {
+    const n = document.querySelectorAll("#ttTbody input.row-check:checked").length;
+    const b = document.getElementById("btnTtBatchAuth"); if (b) b.disabled = !n;
+  }
+  function ttSubmit(dramaId) {
+    const r = ttRows.find(x => x.dramaId === dramaId);
+    if (!r) return;
+    const eps = ttEpsOf(r);
+    const bad = eps.filter(e => e.vStatus === "处理中" || e.vStatus === "失败");
+    if (bad.length) { toast("演示：合集中存在「处理中/失败」状态的剧集视频，不可提审"); return; }
+    if (r.lang !== "英语" && eps.some(e => e.subStatus !== "成功")) { toast("演示：非英语合集，所有视频必须全部上传字幕后才可提审"); return; }
+    msgbox("提审确认", `确认提审剧目 <b>${r.groupName}</b>（${r.lang}）?提审成功后版本记录里将增加一条新的记录。`, () => {
+      r.sh = "审核中";
+      renderTtTable();
+      toast("演示：提审成功，审核状态已变为「审核中」");
+    });
+  }
+
+  /* 创建剧目（选择合集） */
+  let ttPickPool = "";
+  function openTtCreate() {
+    ttPickPool = "";
+    renderTtPool();
+    document.getElementById("ttCreateMask").classList.remove("hidden");
+  }
+  function renderTtPool() {
+    const g = id => { const el = document.getElementById(id); return el ? el.value.trim().toLowerCase() : ""; };
+    const cid = g("tt-pool-cid"), group = g("tt-pool-group"), name = g("tt-pool-name"), lang = document.getElementById("tt-pool-lang") ? document.getElementById("tt-pool-lang").value : "";
+    const list = TT_POOL.filter(p => (!cid || p.id.includes(cid)) && (!group || p.groupName.toLowerCase().includes(group)) && (!name || p.name.toLowerCase().includes(name)) && (!lang || p.lang === lang));
+    document.getElementById("ttPoolTbody").innerHTML = list.length ? list.map(p =>
+      `<tr onclick="ttPickPool='${p.id}';renderTtPool()"><td><input type="radio" name="ttPoolRadio" ${ttPickPool === p.id ? "checked" : ""} onclick="event.stopPropagation();ttPickPool='${p.id}';renderTtPool()"></td><td>${p.id}</td><td>${txtCell(p.groupName, 160)}</td><td>${txtCell(p.name, 220)}</td><td>${p.lang}</td><td>${p.category}</td><td>${p.epType}</td></tr>`).join("")
+      : '<tr><td colspan="7" class="empty">暂无数据</td></tr>';
+    const poolTotal = document.getElementById("ttPoolTotal");
+    if (poolTotal) poolTotal.textContent = list.length;
+  }
+  function resetTtPool() { ["tt-pool-cid","tt-pool-group","tt-pool-name","tt-pool-lang"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; }); renderTtPool(); }
+  function confirmTtCreate() {
+    if (!ttPickPool) { toast("请先选择一个合集"); return; }
+    const p = TT_POOL.find(x => x.id === ttPickPool);
+    if (ttRows.some(r => r.id === p.id)) { toast("演示：该合集已关联剧目ID，单个合集只可关联一个剧目ID"); return; }
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+    let fakeId = ""; for (let i = 0; i < 4; i++) fakeId += chars[Math.floor(Math.random() * chars.length)];
+    ttRows.unshift({ id: p.id, fakeId, gid: "", dramaId: "77088" + Date.now().toString().slice(-13), groupName: p.groupName, name: p.name, lang: p.lang, online: "--", zs: "待完善", sj: "未上架", sh: "待提审", apps: [] });
+    closeTt("ttCreateMask");
+    renderTtTable();
+    toast(`演示：已创建剧目（合集ID ${p.id}），状态为「待提审 + 待完善」`);
+  }
+
+  /* 授权小程序 */
+  let ttAuthRow = null, ttAuthTmp = [], ttAuthBatch = false;
+  function openTtAuth(dramaId) {
+    if (dramaId) {
+      const r = ttRows.find(x => x.dramaId === dramaId);
+      if (!r) return;
+      ttAuthRow = r; ttAuthBatch = false;
+    } else {
+      const checked = [...document.querySelectorAll("#ttTbody tr")].filter(tr => tr.querySelector("input.row-check") && tr.querySelector("input.row-check").checked)
+        .map(tr => tr.children[4].textContent.trim());
+      const rows = ttRows.filter(r => checked.includes(r.dramaId));
+      if (!rows.length) { toast("请先勾选剧目记录"); return; }
+      ttAuthRow = rows; ttAuthBatch = true;
+    }
+    ttAuthTmp = ttAuthBatch ? [...(ttAuthRow[0].apps || [])] : [...(ttAuthRow.apps || [])];
+    renderTtAuth();
+    document.getElementById("ttAuthMask").classList.remove("hidden");
+  }
+  function renderTtAuth() {
+    const title = document.getElementById("ttAuthTitle");
+    if (title) title.textContent = ttAuthBatch ? "批量授权小程序" : "授权小程序";
+    const authed = TT_APPS.filter(a => ttAuthTmp.includes(a));
+    const notAuthed = TT_APPS.filter(a => !ttAuthTmp.includes(a));
+    const item = (a, authedSide) => `<div class="tt-app-item" onclick="ttToggleApp('${a}')">${a}${TT_APP_SUBMIT.includes(a) ? '<span class="mini-tag" style="background:#e6a23c;margin-left:6px">已提审</span>' : ""}</div>`;
+    document.getElementById("ttAuthNot").innerHTML = notAuthed.map(a => item(a, false)).join("") || '<div class="empty">暂无</div>';
+    document.getElementById("ttAuthYes").innerHTML = authed.map(a => item(a, true)).join("") || '<div class="empty">暂无</div>';
+    document.getElementById("ttAuthNotCount").textContent = `共 ${notAuthed.length} 个`;
+    document.getElementById("ttAuthYesCount").textContent = `共 ${authed.length} 个`;
+  }
+  function ttToggleApp(a) {
+    const i = ttAuthTmp.indexOf(a);
+    if (i >= 0) ttAuthTmp.splice(i, 1); else ttAuthTmp.push(a);
+    renderTtAuth();
+  }
+  function confirmTtAuth() {
+    if (ttAuthBatch) ttAuthRow.forEach(r => { r.apps = [...ttAuthTmp]; r._eps = null; });
+    else { ttAuthRow.apps = [...ttAuthTmp]; ttAuthRow._eps = null; }
+    closeTt("ttAuthMask");
+    toast(`演示：已保存授权关系（已授权 ${ttAuthTmp.length} 个小程序）`);
+  }
+
+  /* 详情二级页（剧集信息 / 版本记录） */
+  function openTtDetail(dramaId) {
+    const r = ttRows.find(x => x.dramaId === dramaId);
+    if (!r) return;
+    ttCurDrama = r; ttDetTab = "info"; ttCurEp = null;
+    const html = buildTtDetailPanel();
+    const el = buildRealPanel(TT_DET_KEY, html);
+    el.innerHTML = html;
+    switchTab(TT_DET_KEY);
+    renderTtEps(); renderTtVers();
+  }
+  function ttSwitchDetTab(m) {
+    ttDetTab = m;
+    const el = document.getElementById("panel-" + encodeURIComponent(TT_DET_KEY));
+    if (el) { el.innerHTML = buildTtDetailPanel(); renderTtEps(); renderTtVers(); }
+  }
+  function ttVersionOps(v) {
+    if (v.sh === "审核通过") {
+      const live = v.state === "线上版本";
+      return `<span class="link" onclick="toast('演示：查看版本 ${v.no} 的剧集视频信息')">详情</span><span class="link${live ? " disabled" : ""}" ${live ? `onclick="toast('该版本已是线上版本')"` : `onclick="ttSetOnline(${v.no})"`}>上线版本</span>`;
+    }
+    if (v.sh === "审核中") return `<span class="link" onclick="toast('演示：查看版本 ${v.no}')">详情</span><span class="link" onclick="ttWithdrawVer(${v.no})">撤回</span>`;
+    if (v.sh === "已驳回") return `<span class="link" onclick="toast('演示：查看版本 ${v.no}')">详情</span><span class="link" onclick="openTtAppeal()">申诉</span>`;
+    if (v.sh === "申诉中") return `<span class="link" onclick="toast('演示：查看版本 ${v.no}')">详情</span><span class="link disabled" onclick="toast('申诉中，不可操作')">申诉</span>`;
+    if (v.sh === "已撤回") return `<span class="link" onclick="toast('演示：查看版本 ${v.no}')">详情</span><span class="link" onclick="ttResendVer(${v.no})">送审</span>`;
+    return `<span class="link" onclick="toast('演示：查看版本 ${v.no}')">详情</span>`;
+  }
+  function buildTtDetailPanel() {
+    const r = ttCurDrama || ttRows[0];
+    const isInfo = ttDetTab === "info";
+    return helpHtml(TT_DET_KEY)
+      + `<div class="card mt12" style="padding:20px;">
+      <div style="font-size:13px;color:#909399;margin-bottom:12px;"><span class="link" onclick="switchTab('${TT_TAB}')">TT媒资审核</span> / 剧集详情 <button class="btn btn-sm" style="float:right" onclick="switchTab('${TT_TAB}')">返回列表</button></div>
+      <div class="eps-tabs">
+        <span class="eps-tab${isInfo ? " active" : ""}" onclick="ttSwitchDetTab('info')">剧集信息</span>
+        <span class="eps-tab${isInfo ? "" : " active"}" onclick="ttSwitchDetTab('ver')">版本记录</span>
+      </div>
+      ${isInfo ? `
+      <div style="margin-top:14px;font-size:15px;font-weight:600;">${r.groupName}</div>
+      <div style="margin-top:4px;font-size:13px;color:#606266;">语言：${r.lang}</div>
+      <div class="table-toolbar" style="padding:12px 0 0;">
+        <button class="btn btn-primary btn-sm" onclick="openTtUploadSub()">上传字幕</button>
+        <button class="btn btn-sm" style="margin-left:8px" onclick="ttSyncSub()">同步字幕</button>
+        <button class="btn btn-sm" style="margin-left:8px" onclick="openTtCover()">变更剧目封面</button>
+      </div>
+      <div style="display:flex;gap:24px;margin-top:8px;">
+        ${videoBoxHtml("01:51", "vTagTt")}
+        <div style="flex:1;min-width:0;">
+          <div class="table-wrap" style="padding:0;">
+            <table style="min-width:980px;"><thead><tr><th style="width:250px;">视频ID</th><th style="width:70px;">ID</th><th style="width:180px;">TikTok剧集ID</th><th style="width:60px;">剧集</th><th>剧名</th><th style="width:50px;">封面</th><th style="width:130px;">字幕</th><th style="width:110px;">视频上传状态</th><th style="width:110px;">字幕上传状态</th><th class="col-ops" style="width:150px">操作</th></tr></thead><tbody id="ttEpsTbody"></tbody></table>
+          </div>
+        </div>
+      </div>` : `
+      <div class="table-wrap" style="margin-top:14px;padding:0;">
+        <table style="min-width:1050px;"><thead><tr><th style="width:80px;">版本号</th><th>合集组名称</th><th style="width:90px;">语言</th><th style="width:170px;">提审时间</th><th style="width:100px;">审核状态</th><th style="width:220px;">失败原因</th><th style="width:100px;">版本状态</th><th class="col-ops" style="width:140px">操作</th></tr></thead><tbody id="ttVersTbody"></tbody></table>
+      </div>
+      <div class="pager">共 <span id="ttVersTotal">0</span> 条</div>`}
+    </div>`;
+  }
+  function renderTtEps() {
+    const tb = document.getElementById("ttEpsTbody");
+    if (!tb || !ttCurDrama) return;
+    const eps = ttEpsOf(ttCurDrama);
+    tb.innerHTML = eps.map(e => `<tr${ttCurEp === e.no ? ' style="background:#ecf5ff;"' : ""}>
+      <td><span class="ellipsis" style="max-width:240px;display:inline-block">${e.vid}</span></td>
+      <td>${e.id}</td><td>${e.ttid}</td><td>${e.no}</td><td>${txtCell(e.name, 120)}</td>
+      <td><div class="thumb">封面</div></td>
+      <td>${e.sub === "-" ? '<span class="dash">-</span>' : `<span class="link" onclick="toast('演示：下载 ${e.sub}')">${e.sub}</span>`}</td>
+      <td>${ttTag(e.vStatus)}</td><td>${ttTag(e.subStatus)}</td>
+      <td class="col-ops"><span class="link" onclick="openTtReplace(${e.no})">替换视频</span><span class="link" onclick="openTtUpSubOne(${e.no})">上传字幕</span><span class="link" onclick="ttPlay(${e.no})">播放</span></td>
+    </tr>`).join("");
+  }
+  function renderTtVers() {
+    const tb = document.getElementById("ttVersTbody");
+    if (!tb || !ttCurDrama) return;
+    const vers = ttVersOf(ttCurDrama);
+    tb.innerHTML = vers.length ? vers.map(v => `<tr>
+      <td>${v.no}</td><td>${ttCurDrama.groupName}</td><td>${ttCurDrama.lang}</td><td>${v.time}</td>
+      <td>${ttTag(v.sh)}</td><td>${v.fail === "-" ? '<span class="dash">-</span>' : v.fail}</td>
+      <td>${v.state === "线上版本" ? ttTag("线上版本") : '<span class="dash">-</span>'}</td>
+      <td class="col-ops">${ttVersionOps(v)}</td>
+    </tr>`).join("") : '<tr><td colspan="8" class="empty">暂无数据（剧目未提审，暂无版本记录）</td></tr>';
+    document.getElementById("ttVersTotal").textContent = vers.length;
+  }
+  function ttPlay(no) {
+    ttCurEp = no; renderTtEps();
+    const e = ttEpsOf(ttCurDrama).find(x => x.no === no);
+    const v = document.getElementById("vTagTt");
+    if (v) v.textContent = "00:00/01:51";
+    toast(`演示：左侧播放器播放第 ${no} 集（${e.name}）`);
+  }
+  function ttSyncSub() {
+    msgbox("同步字幕", `将自动同步该合集组下最新提审合集的字幕文件，是否继续?`, () => {
+      const eps = ttEpsOf(ttCurDrama);
+      eps.forEach(e => { if (e.vStatus === "成功") { e.sub = "EP" + String(e.no).padStart(2, "0") + ".srt"; e.subStatus = "成功"; } });
+      if (ttCurDrama.lang !== "英语") ttCurDrama.zs = "已完善";
+      ttCurDrama._subAll = true;
+      renderTtEps(); renderTtTable();
+      toast("演示：字幕已同步");
+    });
+  }
+  function ttSetOnline(no) {
+    msgbox("上线版本确认", `确认将版本 <b>${no}</b> 设为线上版本?上线后将同时下线之前的上线版本。`, () => {
+      ttVersOf(ttCurDrama).forEach(v => { v.state = v.no === no ? "线上版本" : "-"; });
+      ttCurDrama.online = String(no); ttCurDrama.sj = "上架";
+      renderTtVers(); renderTtTable();
+      toast(`演示：版本 ${no} 已上线，之前的上线版本已下线`);
+    });
+  }
+  function ttWithdrawVer(no) {
+    msgbox("撤回确认", `确认撤回版本 <b>${no}</b> 的审核?`, () => {
+      const v = ttVersOf(ttCurDrama).find(x => x.no === no);
+      if (v) { v.sh = "已撤回"; ttCurDrama.sh = "已撤回"; }
+      renderTtVers(); renderTtTable();
+      toast("演示：已撤回审核");
+    });
+  }
+  function ttResendVer(no) {
+    msgbox("送审确认", `确认重新送审版本 <b>${no}</b>?`, () => {
+      const v = ttVersOf(ttCurDrama).find(x => x.no === no);
+      if (v) { v.sh = "审核中"; ttCurDrama.sh = "审核中"; }
+      renderTtVers(); renderTtTable();
+      toast("演示：已重新送审，状态变为「审核中」");
+    });
+  }
+  function saveTtAppeal() {
+    const reason = document.getElementById("tt-appeal-reason").value.trim();
+    if (!reason) { toast("请填写申诉理由"); return; }
+    if (reason.length > 500) { toast("申诉理由最多 500 字"); return; }
+    const n = document.querySelectorAll("#ttAppealFiles .alias-row").length;
+    if (n > 10) { toast("申诉文件最多 10 条"); return; }
+    const v = ttVersOf(ttCurDrama).find(x => x.sh === "已驳回");
+    if (v) { v.sh = "申诉中"; ttCurDrama.sh = "申诉中"; }
+    closeTt("ttAppealMask");
+    renderTtVers(); renderTtTable();
+    toast("演示：申诉已提交，状态变为「申诉中」");
+  }
+  function addAppealFile() {
+    const box = document.getElementById("ttAppealFiles");
+    const n = box.querySelectorAll(".alias-row").length;
+    if (n >= 10) { toast("申诉文件最多 10 条"); return; }
+    const div = document.createElement("div");
+    div.className = "alias-row";
+    div.innerHTML = `<input class="input" type="file"><span class="alias-link" style="color:#f56c6c;" onclick="this.parentNode.remove()">删除</span>`;
+    box.appendChild(div);
+  }
+
+  /* 弹窗：上传字幕（批量 / 单集）、替换视频、变更剧目封面、申诉 */
+  let ttUpSubEp = null, ttReplaceEp = null;
+  function openTtUploadSub() {
+    ttUpSubEp = null;
+    document.getElementById("ttUploadSubTitle").textContent = "上传字幕（批量）";
+    document.getElementById("ttUploadSubNote").textContent = "本地上传：仅限 srt 文件、支持多选；按字幕文件名称中的数字与未上传字幕的剧集匹配上传，匹配不上或剧集已有字幕则跳过。";
+    document.getElementById("ttUploadSubMask").classList.remove("hidden");
+  }
+  function openTtUpSubOne(no) {
+    const e = ttEpsOf(ttCurDrama).find(x => x.no === no);
+    if (e.vStatus !== "成功") { toast("演示：只有视频上传成功的才可添加字幕"); return; }
+    ttUpSubEp = no;
+    document.getElementById("ttUploadSubTitle").textContent = `上传字幕（第 ${no} 集）`;
+    document.getElementById("ttUploadSubNote").textContent = "上传字幕文件并绑定视频ID，仅限 srt 文件。";
+    document.getElementById("ttUploadSubMask").classList.remove("hidden");
+  }
+  function confirmTtUploadSub() {
+    const eps = ttEpsOf(ttCurDrama);
+    if (ttUpSubEp) {
+      const e = eps.find(x => x.no === ttUpSubEp);
+      if (e) { e.sub = "EP" + String(e.no).padStart(2, "0") + ".srt"; e.subStatus = "成功"; }
+    } else {
+      eps.forEach(e => { if (e.vStatus === "成功" && e.subStatus !== "成功") { e.sub = "EP" + String(e.no).padStart(2, "0") + ".srt"; e.subStatus = "成功"; } });
+      if (ttCurDrama.lang !== "英语") ttCurDrama.zs = "已完善";
+      ttCurDrama._subAll = true;
+    }
+    closeTt("ttUploadSubMask");
+    renderTtEps(); renderTtTable();
+    toast("演示：字幕上传完成");
+  }
+  function openTtReplace(no) {
+    ttReplaceEp = no;
+    const e = ttEpsOf(ttCurDrama).find(x => x.no === no);
+    document.getElementById("ttReplaceEpLabel").textContent = `第 ${no} 集（${e.name}）`;
+    document.getElementById("ttReplaceMask").classList.remove("hidden");
+  }
+  function confirmTtReplace() {
+    const e = ttEpsOf(ttCurDrama).find(x => x.no === ttReplaceEp);
+    if (e) { e.vStatus = "成功"; e.vid = "v25e6agm0018dbte4new" + e.no; }
+    closeTt("ttReplaceMask");
+    renderTtEps();
+    toast("演示：新视频已上传并与当前剧集绑定（若最新版本非「未提审/已撤回」将新增版本编辑）");
+  }
+  function confirmTtCover() { closeTt("ttCoverMask"); toast("演示：剧目封面已变更"); }
+
+  function closeTt(id) { const el = document.getElementById(id); if (el) el.classList.add("hidden"); }
+  function buildTtMasks() {
+    const div = document.createElement("div");
+    div.innerHTML = `
+    <div class="mask hidden" id="ttCreateMask">
+      <div class="dialog" style="width:860px;">
+        <div class="dialog-header">选择合集<span class="x" onclick="closeTt('ttCreateMask')">×</span></div>
+        <div class="dialog-body">
+          <div class="search-grid" style="margin-bottom:12px;">
+            <div class="sitem"><label>合集ID</label><input class="input" placeholder="请输入合集ID" id="tt-pool-cid"></div>
+            <div class="sitem"><label>合集组</label><input class="input" placeholder="请输入合集组" id="tt-pool-group"></div>
+            <div class="sitem"><label>合集名称</label><input class="input" placeholder="请输入合集名称" id="tt-pool-name"></div>
+            <div class="sitem"><label>语言</label><select class="input" id="tt-pool-lang"><option value="">请选择</option>${TT_LANGS.map(l => `<option>${l}</option>`).join("")}</select></div>
+          </div>
+          <div class="search-btns" style="margin-bottom:12px;"><button class="btn btn-primary" onclick="renderTtPool()">搜 索</button><button class="btn" onclick="resetTtPool()">重 置</button></div>
+          <div class="table-wrap"><table style="min-width:760px;"><thead><tr><th style="width:40px;"></th><th style="width:80px;">合集ID</th><th style="width:160px;">合集组名称</th><th>合集名称</th><th style="width:90px;">语言</th><th style="width:80px;">类别</th><th style="width:100px;">剧集类型</th></tr></thead><tbody id="ttPoolTbody"></tbody></table></div>
+          <div class="pager">共 <span id="ttPoolTotal">0</span> 条</div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttCreateMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="confirmTtCreate()">确 定</button></div>
+      </div>
+    </div>
+    <div class="mask hidden" id="ttAuthMask">
+      <div class="dialog" style="width:760px;">
+        <div class="dialog-header"><span id="ttAuthTitle">授权小程序</span><span class="x" onclick="closeTt('ttAuthMask')">×</span></div>
+        <div class="dialog-body">
+          <div style="font-size:12px;color:#909399;margin-bottom:10px;">仅展示「起点时光」主体的小程序（非必填过滤）</div>
+          <div style="display:flex;gap:16px;">
+            <div style="flex:1;border:1px solid #dcdfe6;border-radius:4px;overflow:hidden;">
+              <div style="padding:8px 12px;background:#f5f7fa;border-bottom:1px solid #ebeef5;font-weight:600;">未授权小程序 <span id="ttAuthNotCount" style="font-weight:400;color:#909399;font-size:12px;"></span></div>
+              <div id="ttAuthNot" style="max-height:320px;overflow-y:auto;"></div>
+            </div>
+            <div style="flex:1;border:1px solid #dcdfe6;border-radius:4px;overflow:hidden;">
+              <div style="padding:8px 12px;background:#f5f7fa;border-bottom:1px solid #ebeef5;font-weight:600;">已授权小程序 <span id="ttAuthYesCount" style="font-weight:400;color:#909399;font-size:12px;"></span></div>
+              <div id="ttAuthYes" style="max-height:320px;overflow-y:auto;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttAuthMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="confirmTtAuth()">保 存</button></div>
+      </div>
+    </div>
+    <div class="mask hidden" id="ttUploadSubMask">
+      <div class="dialog" style="width:520px;">
+        <div class="dialog-header"><span id="ttUploadSubTitle">上传字幕</span><span class="x" onclick="closeTt('ttUploadSubMask')">×</span></div>
+        <div class="dialog-body">
+          <div class="form-item"><label class="form-label">上传方式</label><div class="form-content"><label style="margin-right:16px;"><input type="radio" name="ttUpSubWay" checked> 本地上传</label></div></div>
+          <div class="form-item"><label class="form-label">字幕文件</label><div class="form-content"><input class="input" type="file" multiple accept=".srt"></div></div>
+          <div id="ttUploadSubNote" style="font-size:12px;color:#909399;line-height:1.6;"></div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttUploadSubMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="confirmTtUploadSub()">确 定</button></div>
+      </div>
+    </div>
+    <div class="mask hidden" id="ttReplaceMask">
+      <div class="dialog" style="width:520px;">
+        <div class="dialog-header">替换视频<span class="x" onclick="closeTt('ttReplaceMask')">×</span></div>
+        <div class="dialog-body">
+          <div class="form-item"><label class="form-label">替换剧集</label><div class="form-content" id="ttReplaceEpLabel" style="line-height:32px;"></div></div>
+          <div class="form-item"><label class="form-label">视频文件</label><div class="form-content"><input class="input" type="file" accept="video/*"></div></div>
+          <div style="font-size:12px;color:#909399;line-height:1.6;">替换视频/排序操作时，若最新版本为「未提审」「已撤回」状态则在最新版本中编辑，非这两个状态则新增一个版本进行编辑。</div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttReplaceMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="confirmTtReplace()">确 定</button></div>
+      </div>
+    </div>
+    <div class="mask hidden" id="ttCoverMask">
+      <div class="dialog" style="width:480px;">
+        <div class="dialog-header">变更剧目封面<span class="x" onclick="closeTt('ttCoverMask')">×</span></div>
+        <div class="dialog-body">
+          <div class="form-item"><label class="form-label">封面文件</label><div class="form-content"><input class="input" type="file" accept="image/*"></div></div>
+          <div style="font-size:12px;color:#909399;">仅支持 jpg / png，取上传图片作为新的剧目封面。</div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttCoverMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="confirmTtCover()">确 定</button></div>
+      </div>
+    </div>
+    <div class="mask hidden" id="ttAppealMask">
+      <div class="dialog" style="width:560px;">
+        <div class="dialog-header">申诉<span class="x" onclick="closeTt('ttAppealMask')">×</span></div>
+        <div class="dialog-body">
+          <div class="form-item"><label class="form-label"><span class="req">*</span>申诉理由</label><div class="form-content"><textarea class="input" id="tt-appeal-reason" rows="4" maxlength="500" placeholder="最多可填写500字" style="resize:vertical;"></textarea></div></div>
+          <div class="form-item"><label class="form-label">申诉文件</label><div class="form-content">
+            <div id="ttAppealFiles"></div>
+            <div><span class="alias-link" onclick="addAppealFile()">+ 添加文件</span><span style="font-size:12px;color:#909399;margin-left:10px;">最多10条，单条200M以内</span></div>
+          </div></div>
+        </div>
+        <div style="padding:12px 24px 20px;text-align:right;"><button class="btn" onclick="closeTt('ttAppealMask')">取 消</button><button class="btn btn-primary" style="margin-left:8px" onclick="saveTtAppeal()">确 认</button></div>
+      </div>
+    </div>`;
+    document.body.appendChild(div);
+  }
+  function openTtAppeal() {
+    document.getElementById("tt-appeal-reason").value = "";
+    document.getElementById("ttAppealFiles").innerHTML = "";
+    document.getElementById("ttAppealMask").classList.remove("hidden");
+  }
+
   // 单菜单项：合集组管理
   renderMenu();
   renderTabs();
@@ -2785,6 +3309,9 @@
   renderSmTable();
   renderSupTable();
   renderSettle();
+  buildTtMasks();
+  buildRealPanel(TT_TAB, buildTtPanel());
+  renderTtTable();
   renderPanels();
   document.getElementById('helpSlot').innerHTML = helpHtml(LIST_TAB);
   document.getElementById('formHelpSlot').innerHTML = helpHtml(FORM_TAB);
